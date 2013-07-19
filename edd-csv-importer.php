@@ -18,7 +18,6 @@ if( !class_exists( 'EDD_CSV_Importer' ) ) {
 
 		private static $instance;
 
-
 		/**
 		 * Get active instance
 		 *
@@ -70,13 +69,12 @@ if( !class_exists( 'EDD_CSV_Importer' ) ) {
 		 */
 		private function includes() {
 			require_once EDD_CSV_IMPORTER_DIR . 'includes/scripts.php';
-			require_once EDD_CSV_IMPORTER_DIR . 'includes/admin-pages.php';
-			require_once EDD_CSV_IMPORTER_DIR . 'includes/display-importer.php';
+			require_once EDD_CSV_IMPORTER_DIR . 'includes/metabox.php';
 		}
 
 
 		/**
-		 * Load the plugin language files
+		 * Load plugin language files
 		 *
 		 * @since		1.0.0
 		 * @access		public
@@ -108,6 +106,7 @@ if( !class_exists( 'EDD_CSV_Importer' ) ) {
 		}
 	}
 }
+
 
 function EDD_CSV() {
 	return EDD_CSV_Importer::instance();
