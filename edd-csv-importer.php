@@ -68,7 +68,6 @@ if( !class_exists( 'EDD_CSV_Importer' ) ) {
 		 * @return		void
 		 */
 		private function includes() {
-			require_once EDD_CSV_IMPORTER_DIR . 'includes/scripts.php';
 			require_once EDD_CSV_IMPORTER_DIR . 'includes/metabox.php';
 		}
 
