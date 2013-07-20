@@ -35,17 +35,7 @@ function edd_csv_importer_metabox() {
 					edd_csv_error_handler( $_GET['errno'] );
 				}
 				if( empty( $_GET['step'] ) || $_GET['step'] == 1 ) {
-					if( get_transient( 'edd_csv_file' ) )
-						delete_transient( 'edd_csv_file' );
-
-					if( get_transient( 'edd_csv_map' ) )
-						delete_transient( 'edd_csv_map' );
-
-					if( get_transient( 'csv_fields' ) )
-						delete_transient( 'csv_fields' );
-
-					if( get_transient( 'has_headers' ) )
-						delete_transient( 'has_headers' );
+					edd_csv_cleanup();
 
 					echo '<p><input type="file" name="import_file"/></p>';
 					echo '<p><label for="has_headers"><input type="checkbox" name="has_headers" checked="yes" /> ' . __( 'Does the CSV include a header row?', 'edd-csv-importer' ) . '</label></p>';
@@ -55,7 +45,7 @@ function edd_csv_importer_metabox() {
 					submit_button( __( 'Next', 'edd' ), 'secondary', 'submit', false );
 					echo '</p>';
 				} elseif( $_GET['step'] == 2 ) {
-					$fields = get_transient( 'edd_csv_file' );
+					$fields = get_transient( 'edd_csv_headers' );
 
 					foreach( $fields as $id => $field ) {
 						if( get_transient( 'has_headers' ) ) {
@@ -127,7 +117,8 @@ function edd_process_csv_import() {
 
 	ini_set( 'auto_detect_line_endings', false );
 
-	set_transient( 'edd_csv_file', $fields );
+	set_transient( 'edd_csv_headers', $fields );
+	set_transient( 'edd_csv_file', $import_file );
 
 	wp_redirect( add_query_arg( 'step', '2' ) ); exit;
 
@@ -172,21 +163,22 @@ add_action( 'edd_map_csv', 'edd_map_csv_import' );
  */
 function edd_csv_get_fields( $parent ) {
 	$fields = array(
-		''						=> 'Unmapped',
-		'author_id'				=> 'Author ID',
-		'date_created'			=> 'Date Created',
-		'description'			=> 'Description',
-		'download_name'			=> 'Download Name',
-		'excerpt'				=> 'Excerpt',
-		'status'				=> 'Status',
-		'post_name'				=> 'Post Name',
-		'price'					=> 'Price',
-		'download_files'		=> 'Download Files',
-		'download_limit'		=> 'Download Limit',
-		'hide_purchase_link'	=> 'Hide Purchase Link',
-		'image_files'			=> 'Image Files',
-		'categories'			=> 'Categories',
-		'tags'					=> 'Tags'
+		''							=> 'Unmapped',
+		'post_author'				=> 'Author ID',
+		'_edd_button_behavior'		=> 'Button Behavior',
+		'_edd_categories'			=> 'Categories',
+		'post_date'					=> 'Date Created',
+		'post_content'				=> 'Description',
+		'_edd_files'				=> 'Download Files',
+		'_edd_download_limit'		=> 'Download Limit',
+		'post_title'				=> 'Download Name',
+		'post_excerpt'				=> 'Excerpt',
+		'_edd_hide_purchase_link'	=> 'Hide Purchase Link',
+		'_edd_images'				=> 'Image Files',
+		'post_name'					=> 'Post Name',
+		'edd_price'					=> 'Price',
+		'post_status'				=> 'Status',
+		'_edd_tags'					=> 'Tags'
 	);
 
 	if( has_filter( 'edd_csv_fields' ) )
@@ -284,4 +276,28 @@ function edd_csv_error_handler( $errno ) {
 	}
 
 	echo '<div class="error"><p>' . $error . '</p></div>';
+}
+
+
+/**
+ * Cleanup unneeded transients
+ *
+ * @since		1.0.0
+ * @return		void
+ */
+function edd_csv_cleanup() {
+	if( get_transient( 'edd_csv_headers' ) )
+		delete_transient( 'edd_csv_headers' );
+
+	if( get_transient( 'edd_csv_file' ) )
+		delete_transient( 'edd_csv_file' );
+
+	if( get_transient( 'edd_csv_map' ) )
+		delete_transient( 'edd_csv_map' );
+
+	if( get_transient( 'csv_fields' ) )
+		delete_transient( 'csv_fields' );
+
+	if( get_transient( 'has_headers' ) )
+		delete_transient( 'has_headers' );
 }
