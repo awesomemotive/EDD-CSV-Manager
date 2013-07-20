@@ -181,8 +181,9 @@ function edd_csv_get_fields( $parent ) {
 		'_edd_tags'					=> 'Tags'
 	);
 
-	if( has_filter( 'edd_csv_fields' ) )
-		$fields = apply_filters( 'edd_csv_fields', $fields );
+	$return = '';
+
+	$fields = apply_filters( 'edd_csv_fields', $fields );
 
 	foreach( $fields as $field_name => $field_title ) {
 		$return .= '<option name="' . $field_name . '" value="' . $field_name . '"' . edd_csv_map_preset( $parent, $field_name ) . '>' . $field_title . '</option>';
