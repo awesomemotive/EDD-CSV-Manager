@@ -174,7 +174,7 @@ function edd_csv_process_rows() {
 
  			}
 
- 			if( $headers && $i > 0 ) {
+ 			if( ( $headers && $i > 0 | || ! $headers ) {
 
 				$post_data = array(
 					'post_name'    => $row[ $post_name_key ],
