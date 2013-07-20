@@ -66,7 +66,7 @@ function edd_csv_importer_metabox() {
 					submit_button( __( 'Next', 'edd' ), 'secondary', 'submit', false );
 					echo '</p>';
 				} elseif( $_GET['step'] == 3 ) {
-					$test = get_transient( 'edd_csv_map' ); print_r( $test );
+					edd_csv_process_rows();
 				}
 			?>
 			</form>
@@ -117,13 +117,94 @@ function edd_process_csv_import() {
 
 	ini_set( 'auto_detect_line_endings', false );
 
+	$desination = trailingslashit( WP_CONTENT_DIR ) . basename( $import_file );
+
+	move_uploaded_file( $import_file, $desination );
+
 	set_transient( 'edd_csv_headers', $fields );
-	set_transient( 'edd_csv_file', $import_file );
+	set_transient( 'edd_csv_file', basename( $import_file ) );
 
 	wp_redirect( add_query_arg( 'step', '2' ) ); exit;
 
 }
 add_action( 'edd_upload_csv', 'edd_process_csv_import' );
+
+function edd_csv_process_rows() {
+
+	$defaults = array(
+		'post_name'    => '',
+		'post_author'  => '',
+		'post_title'   => '',
+		'post_content' => '',
+		'post_excerpt' => '',
+		'post_status'  => '',
+		'post_type'    => 'download'
+	);
+
+	$csv_fields = maybe_unserialize( get_transient( 'csv_fields' ) );
+
+	$csv_fields = wp_parse_args( $csv_fields, $defaults );
+
+	$headers    = get_transient( 'edd_csv_headers' );
+
+	echo '<pre>'; print_r( $csv_fields ); echo '</pre>';
+	exit;
+	ini_set( 'auto_detect_line_endings', true );
+
+	$filename = get_transient( 'edd_csv_file' );
+	$file     = trailingslashit( WP_CONTENT_DIR ) . $filename;
+	if ( ( $handle = fopen( $file, 'r' ) ) !== FALSE ) {
+		$i = 0;
+		while ( ( $row = fgetcsv( $handle, 1000 ) ) !== FALSE ) {
+
+			// Get the column keys
+			if( $i < 1 ) {
+				$post_name_key    = array_search( $csv_fields['post_name'],    $row );
+				$post_author_key  = array_search( $csv_fields['post_author'],  $row );
+				$post_title_key   = array_search( $csv_fields['post_title'],   $row );
+				$post_content_key = array_search( $csv_fields['post_content'], $row );
+				$post_excerpt_key = array_search( $csv_fields['post_excerpt'], $row );
+				$post_status_key  = array_search( $csv_fields['post_status'],  $row );
+				$post_date_key    = array_search( $csv_fields['post_date'],    $row );
+			}
+ 			if( ! $headers && $i <= 1 ) {
+
+ 				$i++;
+ 				continue;
+
+ 			}
+
+ 			if( $headers && $i > 0 ) {
+
+				$post_data = array(
+					'post_name'    => $row[ $post_name_key ],
+					'post_author'  => $row[ $post_author_key ],
+					'post_title'   => $row[ $post_title_key ],
+					'post_content' => $row[ $post_content_key ],
+					'post_excerpt' => $row[ $post_name_key ],
+					'post_status'  => $row[ $post_status_key ],
+					'post_date'    => date( 'Y-m-d H:i:s', strtotime( $row[ $post_date_key ] ) ),
+					'post_type'    => 'download'
+				);
+
+				$post_id = wp_insert_post( $post_data );
+
+				// Make sure it was created
+				if( $post_id ) {
+					//update_post_meta( $post_id, '_edd_download_files', $files );
+				}
+
+			}
+
+			$i++;
+		}
+		fclose( $handle );
+		exit;
+	}
+
+	ini_set( 'auto_detect_line_endings', false );
+
+}
 
 
 /**
@@ -140,14 +221,15 @@ function edd_map_csv_import() {
 
 	if( !current_user_can( 'manage_shop_settings' ) ) return;
 
-	set_transient( 'csv_fields', serialize( $_POST['csv_fields'] ) );
+	$fields = array_flip( $_POST['csv_fields'] );
+
 
 	if( edd_csv_map_has_duplicates( $_POST['csv_fields'] ) ) {
 		wp_redirect( add_query_arg( array( 'step' => '2', 'errno' => '1' ) ) );
 		exit;
 	}
 
-	set_transient( 'edd_csv_map', $_POST );
+	set_transient( 'csv_fields', serialize( $fields ) );
 
 	wp_redirect( add_query_arg( 'step', '3' ) ); exit;
 }
@@ -186,7 +268,7 @@ function edd_csv_get_fields( $parent ) {
 	$fields = apply_filters( 'edd_csv_fields', $fields );
 
 	foreach( $fields as $field_name => $field_title ) {
-		$return .= '<option name="' . $field_name . '" value="' . $field_name . '"' . edd_csv_map_preset( $parent, $field_name ) . '>' . $field_title . '</option>';
+		$return .= '<option value="' . $field_name . '"' . edd_csv_map_preset( $parent, $field_name ) . '>' . $field_title . '</option>';
 	}
 
 	return $return;
