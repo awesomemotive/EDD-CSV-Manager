@@ -147,8 +147,8 @@ function edd_csv_process_rows() {
 
 	$headers    = get_transient( 'edd_csv_headers' );
 
-	echo '<pre>'; print_r( $csv_fields ); echo '</pre>';
-	exit;
+	//echo '<pre>'; print_r( $csv_fields ); echo '</pre>';
+
 	ini_set( 'auto_detect_line_endings', true );
 
 	$filename = get_transient( 'edd_csv_file' );
