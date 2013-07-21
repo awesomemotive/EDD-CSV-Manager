@@ -172,7 +172,8 @@ function edd_csv_process_rows() {
 				$post_date_key    = array_search( $csv_fields['post_date'],    $row );
 
 				// Meta fields
-
+				$price_key        = array_search( $csv_fields['_edd_price'], $row );
+				$dl_limit_key     = array_search( $csv_fields['_edd_download_limit'], $row );
 
 				// Categories
 				$categories_key   = array_search( $csv_fields['categories'], $row );
@@ -205,7 +206,10 @@ function edd_csv_process_rows() {
 
 				// Make sure it was created
 				if( $post_id ) {
-					//update_post_meta( $post_id, '_edd_download_files', $files );
+
+					// Set meta fields
+					if( $price_key && ! empty( $row[ $price_key ] ) )
+						update_post_meta( $post_id, 'edd_price', $row[ $price_key ] );
 
 
 					// Set tags
@@ -213,6 +217,7 @@ function edd_csv_process_rows() {
 
 						$tags = array_map( 'trim', explode('|', $row[ $tags_key ] ) );
 
+						// Create tags if they don't exist
 						foreach( $tags as $tag ) {
 							if( ! term_exists( $tag, 'download_tag' ) ) {
 								wp_insert_term( $tag, 'download_tag' );
@@ -227,9 +232,10 @@ function edd_csv_process_rows() {
 
 						$categories = array_map( 'trim', explode('|', $row[ $categories_key ] ) );
 
-						foreach( $tags as $tag ) {
-							if( ! term_exists( $tag, 'download_category' ) ) {
-								wp_insert_term( $tag, 'download_category' );
+						// Create categories if they don't exist
+						foreach( $categories as $category ) {
+							if( ! term_exists( $category, 'download_category' ) ) {
+								wp_insert_term( $category, 'download_category' );
 							}
 						}
 
