@@ -100,12 +100,12 @@ function edd_csv_error_handler( $errno ) {
 			break;
 		case '3':
 			$error = __( 'One or more files failed to import!', 'edd-csv-importer' );
-			if( get_transient( 'edd_file_errors' ) ) {
-				$file_errors = get_transient( 'edd_file_errors' );
-				$file_errors = unserialize( $file_errors );
+			$file_errors = get_transient( 'edd_file_errors' );
+			if( $file_errors ) {
+				$file_errors = maybe_unserialize( $file_errors );
 
 				foreach( $file_errors as $row => $file ) {
-					$data .= sprintf( __( '<br />&middot; The file $1%s cannot be found on line $2%s.', 'edd-csv-importer' ), $file, $row );
+					$data .= sprintf( __( '<br />&middot; The file %s cannot be found on line %s.', 'edd-csv-importer' ), $file['file'], $file['row'] );
 				}
 			}
 			break;
@@ -123,8 +123,8 @@ function edd_csv_error_handler( $errno ) {
  * @return		void
  */
 function edd_csv_cleanup() {
-	if( get_transient( 'edd_file_errors' ) )
-		delete_transient( 'edd_file_errors' );
+	//if( get_transient( 'edd_file_errors' ) )
+		//delete_transient( 'edd_file_errors' );
 
 	if( get_transient( 'edd_csv_headers' ) )
 		delete_transient( 'edd_csv_headers' );

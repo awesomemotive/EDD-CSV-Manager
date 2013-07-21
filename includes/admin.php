@@ -65,9 +65,7 @@ function edd_csv_importer_metabox() {
 					wp_nonce_field( 'edd_import_nonce', 'edd_import_nonce' );
 					submit_button( __( 'Next', 'edd' ), 'secondary', 'submit', false );
 					echo '</p>';
-				} elseif( $_GET['step'] == 3 ) {
-					edd_process_csv_import();
-				}
+				} 
 			?>
 			</form>
 		</div>
@@ -154,8 +152,8 @@ function edd_process_csv_mapping() {
 	}
 
 	set_transient( 'csv_fields', serialize( $fields ) );
-
-	wp_redirect( add_query_arg( 'step', '3' ) ); exit;
+	edd_process_csv_import();
+	//wp_redirect( add_query_arg( 'step', '3' ) ); exit;
 }
 add_action( 'edd_map_csv', 'edd_process_csv_mapping' );
 
@@ -209,8 +207,8 @@ function edd_process_csv_import() {
 				// Meta fields
 				$price_key			= array_search( $csv_fields['_edd_price'], $row );
 				$dl_limit_key		= array_search( $csv_fields['_edd_download_limit'], $row );
-				$button_behavior	= array_search( $csv_fields['_edd_button_behavior'], $row );
-				$hide_link			= array_search( $csv_fields['_edd_hide_purchase_link'], $row );
+				//$button_behavior	= array_search( $csv_fields['_edd_button_behavior'], $row );
+				//$hide_link			= array_search( $csv_fields['_edd_hide_purchase_link'], $row );
 
 				// Categories
 				$categories_key		= array_search( $csv_fields['categories'], $row );
@@ -258,6 +256,7 @@ function edd_process_csv_import() {
 				}
 
 				if( ! empty( $file_errors ) ) {
+					$i++;
 					continue;
 				}
 
@@ -273,11 +272,11 @@ function edd_process_csv_import() {
 					if( $dl_limit_key && !empty( $row[ $dl_limit_key ] ) )
 						update_post_meta( $post_id, '_edd_download_limit', $row[ $dl_limit_key ] );
 
-					if( $button_behavior && !empty( $row[ $button_behavior ] ) )
-						update_post_meta( $post_id, '_edd_button_behavior', $row[ $button_behavior ] );
+					//if( $button_behavior && !empty( $row[ $button_behavior ] ) )
+					//	update_post_meta( $post_id, '_edd_button_behavior', $row[ $button_behavior ] );
 
-					if( $hide_link && !empty( $row[ $hide_link ] ) )
-						update_post_meta( $post_id, '_edd_hide_purchase_link', $row[ $hide_link ] );
+					//if( $hide_link && !empty( $row[ $hide_link ] ) )
+					//	update_post_meta( $post_id, '_edd_hide_purchase_link', $row[ $hide_link ] );
 
 
 					// Set tags
