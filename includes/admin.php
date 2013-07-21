@@ -180,10 +180,10 @@ function edd_process_csv_import() {
 		'tags'			=> ''
 	);
 
-	$csv_fields = maybe_unserialize( get_transient( 'csv_fields' ) );
-	$csv_fields = wp_parse_args( $csv_fields, $defaults );
-
-	$headers = get_transient( 'edd_csv_headers' );
+	$csv_fields  = maybe_unserialize( get_transient( 'csv_fields' ) );
+	$csv_fields  = wp_parse_args( $csv_fields, $defaults );
+	$headers     = get_transient( 'edd_csv_headers' );
+	$file_errors = array();
 
 	//echo '<pre>'; print_r( $csv_fields ); echo '</pre>';
 
@@ -222,12 +222,12 @@ function edd_process_csv_import() {
 				$files_key			= array_search( $csv_fields['_edd_files'], $row );
 			}
 
- 			if( !$headers && $i <= 1 ) {
+ 			if( ! $headers && $i <= 1 ) {
  				$i++;
  				continue;
  			}
 
- 			if( ( $headers && $i > 0 ) || !$headers ) {
+ 			if( ( $headers && $i > 0 ) || ! $headers ) {
 				$post_data = array(
 					'post_name'		=> $row[ $post_name_key ],
 					'post_author'	=> $row[ $post_author_key ],
@@ -241,16 +241,24 @@ function edd_process_csv_import() {
 
 				// Set files
 				if( $files_key && !empty( $row[ $files_key ] ) ) {
-		
+
 					$files = array_map( 'trim', explode( '|', $row[ $files_key ] ) );
 
 					// Make sure files exist
 					foreach( $files as $file ) {
-						if( !strstr( $file, 'http' ) ) {
-							if( file_exists( trailingslashit( WP_CONTENT_DIR ) . $file )
-
+						if( ! stristr( $file, 'http' ) ) {
+							if( ! file_exists( trailingslashit( WP_CONTENT_DIR ) . $file ) ) {
+								$file_errors[] = array(
+									'row'  => $i + 1,
+									'file' => $file
+								);
+							}
 						}
 					}
+				}
+
+				if( ! empty( $file_errors ) ) {
+					continue;
 				}
 
 				$post_id = wp_insert_post( $post_data );
@@ -310,6 +318,14 @@ function edd_process_csv_import() {
 			$i++;
 		}
 		fclose( $handle );
+
+
+		if( ! empty( $file_errors ) ) {
+
+			// record errors here
+
+		}
+
 		exit;
 	}
 
