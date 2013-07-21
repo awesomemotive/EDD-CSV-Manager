@@ -209,12 +209,17 @@ function edd_process_csv_import() {
 				// Meta fields
 				$price_key			= array_search( $csv_fields['_edd_price'], $row );
 				$dl_limit_key		= array_search( $csv_fields['_edd_download_limit'], $row );
+				$button_behavior	= array_search( $csv_fields['_edd_button_behavior'], $row );
+				$hide_link			= array_search( $csv_fields['_edd_hide_purchase_link'], $row );
 
 				// Categories
 				$categories_key		= array_search( $csv_fields['categories'], $row );
 
 				// Tags
 				$tags_key			= array_search( $csv_fields['tags'], $row );
+
+				// Files
+				$files_key			= array_search( $csv_fields['_edd_files'], $row );
 			}
 
  			if( !$headers && $i <= 1 ) {
@@ -234,20 +239,43 @@ function edd_process_csv_import() {
 					'post_type'		=> 'download'
 				);
 
+				// Set files
+				if( $files_key && !empty( $row[ $files_key ] ) ) {
+		
+					$files = array_map( 'trim', explode( '|', $row[ $files_key ] ) );
+
+					// Make sure files exist
+					foreach( $files as $file ) {
+						if( !strstr( $file, 'http' ) ) {
+							if( file_exists( trailingslashit( WP_CONTENT_DIR ) . $file )
+
+						}
+					}
+				}
+
 				$post_id = wp_insert_post( $post_data );
 
 				// Make sure it was created
 				if( $post_id ) {
 
 					// Set meta fields
-					if( $price_key && ! empty( $row[ $price_key ] ) )
+					if( $price_key && !empty( $row[ $price_key ] ) )
 						update_post_meta( $post_id, 'edd_price', $row[ $price_key ] );
+
+					if( $dl_limit_key && !empty( $row[ $dl_limit_key ] ) )
+						update_post_meta( $post_id, '_edd_download_limit', $row[ $dl_limit_key ] );
+
+					if( $button_behavior && !empty( $row[ $button_behavior ] ) )
+						update_post_meta( $post_id, '_edd_button_behavior', $row[ $button_behavior ] );
+
+					if( $hide_link && !empty( $row[ $hide_link ] ) )
+						update_post_meta( $post_id, '_edd_hide_purchase_link', $row[ $hide_link ] );
 
 
 					// Set tags
-					if( $tags_key && ! empty( $row[ $tags_key ] ) ) {
+					if( $tags_key && !empty( $row[ $tags_key ] ) ) {
 
-						$tags = array_map( 'trim', explode('|', $row[ $tags_key ] ) );
+						$tags = array_map( 'trim', explode( '|', $row[ $tags_key ] ) );
 
 						// Create tags if they don't exist
 						foreach( $tags as $tag ) {
@@ -258,6 +286,7 @@ function edd_process_csv_import() {
 
 						wp_set_object_terms( $post_id, $tags, 'download_tag' );
 					}
+
 
 					// Set categories
 					if( $categories_key && !empty( $row[ $categories_key ] ) ) {
@@ -300,7 +329,7 @@ function edd_csv_get_fields( $parent ) {
 	$fields = array(
 		''							=> 'Unmapped',
 		'post_author'				=> 'Author ID',
-		'edd_button_behavior'		=> 'Button Behavior',
+		'_edd_button_behavior'		=> 'Button Behavior',
 		'post_date'					=> 'Date Created',
 		'post_content'				=> 'Description',
 		'post_title'				=> 'Download Name',
