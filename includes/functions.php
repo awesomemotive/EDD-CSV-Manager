@@ -84,10 +84,12 @@ function edd_csv_map_preset_on_error( $parent, $field_name ) {
  * Handle errors
  *
  * @since		1.0.0
- * @param		int $errno
+ * @param		int $errno The specific errorcode to handle
+ * @param		mixed $data Arbitrary data that may need to be handled
  * @return		void
  */
 function edd_csv_error_handler( $errno ) {
+	$data = '';
 
 	switch( $errno ) {
 		case '1':
@@ -96,9 +98,21 @@ function edd_csv_error_handler( $errno ) {
 		case '2':
 			$error = __( 'You must specify a valid CSV file to import!', 'edd-csv-importer' );
 			break;
+		case '3':
+			$error = __( 'One or more files failed to import!', 'edd-csv-importer' );
+			if( get_transient( 'edd_file_errors' ) ) {
+				$file_errors = get_transient( 'edd_file_errors' );
+				$file_errors = unserialize( $file_errors );
+
+				foreach( $file_errors as $row => $file ) {
+					$data .= sprintf( __( '<br />&middot; The file $1%s cannot be found on line $2%s.', 'edd-csv-importer' ), $file, $row );
+				}
+			}
+			break;
+				
 	}
 
-	echo '<div class="error"><p>' . $error . '</p></div>';
+	echo '<div class="error"><p>' . $error . '</p>' . $data . '</div>';
 }
 
 
@@ -109,6 +123,9 @@ function edd_csv_error_handler( $errno ) {
  * @return		void
  */
 function edd_csv_cleanup() {
+	if( get_transient( 'edd_file_errors' ) )
+		delete_transient( 'edd_file_errors' );
+
 	if( get_transient( 'edd_csv_headers' ) )
 		delete_transient( 'edd_csv_headers' );
 

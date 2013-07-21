@@ -319,11 +319,12 @@ function edd_process_csv_import() {
 		}
 		fclose( $handle );
 
-
 		if( ! empty( $file_errors ) ) {
+			$file_errors = serialize( $file_errors );
+			set_transient( 'edd_file_errors', $file_errors );
 
-			// record errors here
-
+			wp_redirect( add_query_arg( array( 'step' => '1', 'errno' => '3' ) ) );
+			exit;
 		}
 
 		exit;
