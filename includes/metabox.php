@@ -138,7 +138,9 @@ function edd_csv_process_rows() {
 		'post_content' => '',
 		'post_excerpt' => '',
 		'post_status'  => '',
-		'post_type'    => 'download'
+		'post_type'    => 'download',
+		'categories'   => '',
+		'tags'         => ''
 	);
 
 	$csv_fields = maybe_unserialize( get_transient( 'csv_fields' ) );
@@ -147,7 +149,7 @@ function edd_csv_process_rows() {
 
 	$headers    = get_transient( 'edd_csv_headers' );
 
-	//echo '<pre>'; print_r( $csv_fields ); echo '</pre>';
+	echo '<pre>'; print_r( $csv_fields ); echo '</pre>';
 
 	ini_set( 'auto_detect_line_endings', true );
 
@@ -159,6 +161,8 @@ function edd_csv_process_rows() {
 
 			// Get the column keys
 			if( $i < 1 ) {
+
+				// Default fields
 				$post_name_key    = array_search( $csv_fields['post_name'],    $row );
 				$post_author_key  = array_search( $csv_fields['post_author'],  $row );
 				$post_title_key   = array_search( $csv_fields['post_title'],   $row );
@@ -166,6 +170,16 @@ function edd_csv_process_rows() {
 				$post_excerpt_key = array_search( $csv_fields['post_excerpt'], $row );
 				$post_status_key  = array_search( $csv_fields['post_status'],  $row );
 				$post_date_key    = array_search( $csv_fields['post_date'],    $row );
+
+				// Meta fields
+
+
+				// Categories
+				$categories_key   = array_search( $csv_fields['categories'], $row );
+
+				// Tags
+				$tags_key         = array_search( $csv_fields['tags'], $row );
+
 			}
  			if( ! $headers && $i <= 1 ) {
 
@@ -174,7 +188,7 @@ function edd_csv_process_rows() {
 
  			}
 
- 			if( ( $headers && $i > 0 | || ! $headers ) {
+ 			if( ( $headers && $i > 0 ) || ! $headers ) {
 
 				$post_data = array(
 					'post_name'    => $row[ $post_name_key ],
@@ -192,6 +206,36 @@ function edd_csv_process_rows() {
 				// Make sure it was created
 				if( $post_id ) {
 					//update_post_meta( $post_id, '_edd_download_files', $files );
+
+
+					// Set tags
+					if( $tags_key && ! empty( $row[ $tags_key ] ) ) {
+
+						$tags = array_map( 'trim', explode('|', $row[ $tags_key ] ) );
+
+						foreach( $tags as $tag ) {
+							if( ! term_exists( $tag, 'download_tag' ) ) {
+								wp_insert_term( $tag, 'download_tag' );
+							}
+						}
+
+						wp_set_object_terms( $post_id, $tags, 'download_tag' );
+					}
+
+					// Set categories
+					if( $categories_key && ! empty( $row[ $categories_key ] ) ) {
+
+						$categories = array_map( 'trim', explode('|', $row[ $categories_key ] ) );
+
+						foreach( $tags as $tag ) {
+							if( ! term_exists( $tag, 'download_category' ) ) {
+								wp_insert_term( $tag, 'download_category' );
+							}
+						}
+
+						wp_set_object_terms( $post_id, $categories, 'download_category' );
+					}
+
 				}
 
 			}
@@ -247,20 +291,20 @@ function edd_csv_get_fields( $parent ) {
 	$fields = array(
 		''							=> 'Unmapped',
 		'post_author'				=> 'Author ID',
-		'_edd_button_behavior'		=> 'Button Behavior',
-		'_edd_categories'			=> 'Categories',
+		'edd_button_behavior'		=> 'Button Behavior',
 		'post_date'					=> 'Date Created',
 		'post_content'				=> 'Description',
-		'_edd_files'				=> 'Download Files',
-		'_edd_download_limit'		=> 'Download Limit',
 		'post_title'				=> 'Download Name',
 		'post_excerpt'				=> 'Excerpt',
+		'post_name'					=> 'Post Name',
+		'post_status'				=> 'Status',
+		'categories'			    => 'Categories',
+		'tags'					    => 'Tags',
+		'_edd_files'				=> 'Download Files',
+		'_edd_download_limit'		=> 'Download Limit',
 		'_edd_hide_purchase_link'	=> 'Hide Purchase Link',
 		'_edd_images'				=> 'Image Files',
-		'post_name'					=> 'Post Name',
-		'edd_price'					=> 'Price',
-		'post_status'				=> 'Status',
-		'_edd_tags'					=> 'Tags'
+		'_edd_price'				=> 'Price'
 	);
 
 	$return = '';
