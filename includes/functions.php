@@ -109,7 +109,7 @@ function edd_csv_error_handler( $errno ) {
 				}
 			}
 			break;
-				
+
 	}
 
 	echo '<div class="error"><p>' . $error . '</p>' . $data . '</div>';

@@ -65,7 +65,7 @@ function edd_csv_importer_metabox() {
 					wp_nonce_field( 'edd_import_nonce', 'edd_import_nonce' );
 					submit_button( __( 'Next', 'edd' ), 'secondary', 'submit', false );
 					echo '</p>';
-				} 
+				}
 			?>
 			</form>
 		</div>
@@ -89,6 +89,8 @@ function edd_process_csv_upload() {
 
 	if( !current_user_can( 'manage_shop_settings' ) ) return;
 
+	$csv = new parseCSV();
+
 	$import_file = $_FILES['import_file']['tmp_name'];
 
 	// Make sure we have a valid CSV
@@ -97,28 +99,17 @@ function edd_process_csv_upload() {
 		exit;
 	}
 
-	ini_set( 'auto_detect_line_endings', true );
-
-	$file = fopen( $import_file, 'r' );
-
-	if( ( $line = fgetcsv( $file ) ) !== false ) {
-		if( isset( $_POST['has_headers'] ) ) {
-			set_transient( 'has_headers', '1' );
-		}
-
-		foreach( $line as $field ) {
-			$fields[] = $field;
-		}
-	}
-	fclose( $file );
-
-	ini_set( 'auto_detect_line_endings', false );
+	// Detect deliminator
+	$csv->auto( $import_file );
 
 	// Duplicate the temp file so it doesn't disappear on us
 	$desination = trailingslashit( WP_CONTENT_DIR ) . basename( $import_file );
 	move_uploaded_file( $import_file, $desination );
 
-	set_transient( 'edd_csv_headers', $fields );
+	if( isset( $_POST['has_headers'] ) ) {
+		set_transient( 'has_headers', '1' );
+		set_transient( 'edd_csv_headers', $csv->titles );
+	}
 	set_transient( 'edd_csv_file', basename( $import_file ) );
 
 	wp_redirect( add_query_arg( 'step', '2' ) ); exit;
@@ -297,7 +288,7 @@ function edd_process_csv_import() {
 					require_once ABSPATH . 'wp-adminincludes/image.php';
 					require_once ABSPATH . 'wp-adminincludes/file.php';
 					require_once ABSPATH . 'wp-adminincludes/media.php';
-					
+
 					$image = true;
 					$image_details = parse_url( $image_key );
 					if( ! $image_details || ! isset( $image_details['scheme'] ) || 'http' != $image_details['scheme'] || 'https' != $image_details['scheme'] ) {
