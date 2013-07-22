@@ -49,12 +49,12 @@ function edd_csv_importer_metabox() {
 
 					foreach( $fields as $id => $field ) {
 						if( get_transient( 'has_headers' ) ) {
+							$field_label = $field;
+							$field_id = $field;
+						} else {
 							$i = $id + 1;
 							$field_label = 'column_' . $i;
 							$field_id = $id;
-						} else {
-							$field_label = $field;
-							$field_id = $field;
 						}
 
 						echo '<div style="width: 200px; display: inline-block;">' . $field_label . '</div>';
@@ -100,17 +100,14 @@ function edd_process_csv_upload() {
 	ini_set( 'auto_detect_line_endings', true );
 
 	$file = fopen( $import_file, 'r' );
-	if( ( $line = fgetcsv( $file ) ) !== false ) {
-		$num = count( $line );
 
-		$start = 0;
-		if( !$_POST['has_headers'] ) {
-			$start = 1;
+	if( ( $line = fgetcsv( $file ) ) !== false ) {
+		if( isset( $_POST['has_headers'] ) ) {
 			set_transient( 'has_headers', '1' );
 		}
 
-		for( $c = $start; $c < $num; $c++ ) {
-			$fields[] = $line[$c];
+		foreach( $line as $field ) {
+			$fields[] = $field;
 		}
 	}
 	fclose( $file );
@@ -207,8 +204,8 @@ function edd_process_csv_import() {
 				// Meta fields
 				$price_key			= array_search( $csv_fields['_edd_price'], $row );
 				$dl_limit_key		= array_search( $csv_fields['_edd_download_limit'], $row );
-				//$button_behavior	= array_search( $csv_fields['_edd_button_behavior'], $row );
-				//$hide_link			= array_search( $csv_fields['_edd_hide_purchase_link'], $row );
+				$button_behavior	= array_search( $csv_fields['_edd_button_behavior'], $row );
+				$hide_link			= array_search( $csv_fields['_edd_hide_purchase_link'], $row );
 
 				// Categories
 				$categories_key		= array_search( $csv_fields['categories'], $row );
@@ -218,6 +215,9 @@ function edd_process_csv_import() {
 
 				// Files
 				$files_key			= array_search( $csv_fields['_edd_files'], $row );
+
+				// Featured image
+				$image_key			= array_search( $csv_fields['_thumbnail_id'], $row );
 			}
 
  			if( ! $headers && $i <= 1 ) {
@@ -241,17 +241,47 @@ function edd_process_csv_import() {
 				if( $files_key && !empty( $row[ $files_key ] ) ) {
 
 					$files = array_map( 'trim', explode( '|', $row[ $files_key ] ) );
+					$final_files = array();
 
 					// Make sure files exist
 					foreach( $files as $file ) {
-						if( ! stristr( $file, 'http' ) ) {
-							if( ! file_exists( trailingslashit( WP_CONTENT_DIR ) . $file ) ) {
+						$file_details = parse_url( $file );
+						if( ! $file_details || ! isset( $file_details['scheme'] ) || 'http' != $file_details['scheme'] || 'https' != $file_details['scheme'] ) {
+							// Set preferred path for file hosting
+							$search_base_path = trailingslashit( WP_CONTENT_DIR );
+							$preferred_path = $search_base_path . 'uploads/edd/' . $file;
+
+							if( file_exists( $preferred_path ) ) {
+								// Check /wp-content/uploads/edd/$file
+								$file_path = $preferred_path;
+							} elseif( file_exists( $search_base_path . $file ) ) {
+								// Check /wp-content/$file
+								if( move_uploaded_file( $search_base_path . $file, $preferred_path ) ) {
+									$file_path = $preferred_path;
+								} else {
+									$file_path = $search_base_path . $file;
+								}
+							} elseif( file_exists( $search_base_path . 'uploads/' . $file ) ) {
+								// Check /wp-content/uploads/$file
+								if( move_uploaded_file( $search_base_pat . 'uploads/' . $file, $preferred_path ) ) {
+									$file_path = $preferred_path;
+								} else {
+									$file_path = $search_base_path . 'uploads/' . $file;
+								}
+							} else {
+								// Error
 								$file_errors[] = array(
 									'row'  => $i + 1,
 									'file' => $file
 								);
 							}
 						}
+
+						// Store file in array for use later
+						$final_files[] = array(
+							'name' => basename( $file_path ),
+							'file' => str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $file_path )
+						);
 					}
 				}
 
@@ -260,6 +290,56 @@ function edd_process_csv_import() {
 					continue;
 				}
 
+				$image = false;
+				// Set featured images
+				if( $image_key && !empty( $row[ $image_key ] ) ) {
+
+					require_once ABSPATH . 'wp-adminincludes/image.php';
+					require_once ABSPATH . 'wp-adminincludes/file.php';
+					require_once ABSPATH . 'wp-adminincludes/media.php';
+					
+					$image = true;
+					$image_details = parse_url( $image_key );
+					if( ! $image_details || ! isset( $image_details['scheme'] ) || 'http' != $image_details['scheme'] || 'https' != $image_details['scheme'] ) {
+						// Set preferred path for file hosting
+						$search_base_path = trailingslashit( WP_CONTENT_DIR );
+						$preferred_path = $search_base_path . 'uploads/edd/' . $image_key;
+
+						if( file_exists( $preferred_path ) ) {
+							// Check /wp-content/uploads/edd/$file
+							$file_path = $preferred_path;
+						} elseif( file_exists( $search_base_path . $image_key ) ) {
+							// Check /wp-content/$file
+							if( move_uploaded_file( $search_base_path . $image_key, $preferred_path ) ) {
+								$file_path = $preferred_path;
+							} else {
+								$file_path = $search_base_path . $image_key;
+							}
+						} elseif( file_exists( $search_base_path . 'uploads/' . $image_key ) ) {
+							// Check /wp-content/uploads/$file
+							if( move_uploaded_file( $search_base_pat . 'uploads/' . $image_key, $preferred_path ) ) {
+								$file_path = $preferred_path;
+							} else {
+								$file_path = $search_base_path . 'uploads/' . $image_key;
+							}
+						} else {
+							// Error
+							$image = false;
+							$file_errors[] = array(
+								'row'  => $i + 1,
+								'file' => $image_key
+							);
+						}
+					}
+
+					// Store file in array for use later
+					$final_files[] = array(
+						'name' => basename( $file_path ),
+						'file' => str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $file_path )
+					);
+				}
+
+				// Check /wp-content/uploads/edd/$file
 				$post_id = wp_insert_post( $post_data );
 
 				// Make sure it was created
@@ -272,12 +352,19 @@ function edd_process_csv_import() {
 					if( $dl_limit_key && !empty( $row[ $dl_limit_key ] ) )
 						update_post_meta( $post_id, '_edd_download_limit', $row[ $dl_limit_key ] );
 
-					//if( $button_behavior && !empty( $row[ $button_behavior ] ) )
-					//	update_post_meta( $post_id, '_edd_button_behavior', $row[ $button_behavior ] );
+					if( $button_behavior && !empty( $row[ $button_behavior ] ) )
+						update_post_meta( $post_id, '_edd_button_behavior', $row[ $button_behavior ] );
 
-					//if( $hide_link && !empty( $row[ $hide_link ] ) )
-					//	update_post_meta( $post_id, '_edd_hide_purchase_link', $row[ $hide_link ] );
+					if( $hide_link && !empty( $row[ $hide_link ] ) )
+						update_post_meta( $post_id, '_edd_hide_purchase_link', $row[ $hide_link ] );
 
+					// Set download files
+					if( ! empty( $final_files ) )
+						update_post_meta( $post_id, 'edd_download_files', $final_files );
+
+					// Attach image
+					if( $image )
+						$attachment_id = wp_handle_upload( $file_path, $post_id );
 
 					// Set tags
 					if( $tags_key && !empty( $row[ $tags_key ] ) ) {
@@ -294,7 +381,6 @@ function edd_process_csv_import() {
 						wp_set_object_terms( $post_id, $tags, 'download_tag' );
 					}
 
-
 					// Set categories
 					if( $categories_key && !empty( $row[ $categories_key ] ) ) {
 
@@ -309,11 +395,8 @@ function edd_process_csv_import() {
 
 						wp_set_object_terms( $post_id, $categories, 'download_category' );
 					}
-
 				}
-
 			}
-
 			$i++;
 		}
 		fclose( $handle );

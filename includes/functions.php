@@ -123,8 +123,8 @@ function edd_csv_error_handler( $errno ) {
  * @return		void
  */
 function edd_csv_cleanup() {
-	//if( get_transient( 'edd_file_errors' ) )
-		//delete_transient( 'edd_file_errors' );
+	if( get_transient( 'edd_file_errors' ) )
+		delete_transient( 'edd_file_errors' );
 
 	if( get_transient( 'edd_csv_headers' ) )
 		delete_transient( 'edd_csv_headers' );
