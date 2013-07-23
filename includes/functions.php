@@ -135,9 +135,6 @@ function edd_csv_cleanup() {
 	if( get_transient( 'edd_csv_map' ) )
 		delete_transient( 'edd_csv_map' );
 
-	if( get_transient( 'csv_fields' ) )
-		delete_transient( 'csv_fields' );
-
 	if( get_transient( 'has_headers' ) )
 		delete_transient( 'has_headers' );
 }
