@@ -191,8 +191,6 @@ function edd_process_csv_import() {
 	// Detect deliminator
 	$csv->auto( $import_file );
 
-	//echo $csv_fields['post_author']; exit;
-
 	// Map headers to post fields
 	$post_name_key		= array_search( $csv_fields['post_name'], $headers );
 	$post_author_key	= array_search( $csv_fields['post_author'], $headers );
