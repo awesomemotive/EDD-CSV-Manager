@@ -47,6 +47,12 @@ function edd_csv_importer_metabox() {
 				} elseif( $_GET['step'] == 2 ) {
 					$fields = get_transient( 'edd_csv_headers' );
 
+					// Output headers
+					echo '<div style="font-weight: bold; border-bottom: 1px solid #000000; width: 350px; margin-bottom: 10px;">';
+					echo '<span style="width: 200px; display: inline-block;">' . __( 'CSV Headers', 'edd-csv-importer' ) . '</span>';
+					echo '<span style="display: inline-block;">' . __( 'EDD Fields', 'edd-csv-importer' ) . '</span>';
+					echo '</div>';
+
 					foreach( $fields as $id => $field ) {
 						if( get_transient( 'has_headers' ) ) {
 							$field_label = $field;
