@@ -64,7 +64,7 @@ function edd_csv_importer_metabox() {
 						}
 
 						echo '<div style="width: 200px; display: inline-block;">' . $field_label . '</div>';
-						echo '<select name="csv_fields[' . $field_id . ']" >' . edd_csv_get_fields( $field_id ) . '</select><br/>';
+						echo '<select name="csv_fields[' . $field_id . ']" >' . edd_csv_get_fields( $field_label ) . '</select><br/>';
 					}
 
 					echo '<p><input type="hidden" name="edd_action" value="map_csv" />';
@@ -214,9 +214,6 @@ function edd_process_csv_import() {
 
 	// Files
 	$files_key			= array_search( $csv_fields['_edd_files'], $headers );
-
-	// Featured image
-	$image_key			= array_search( $csv_fields['_edd_images'], $headers );
 	foreach ( $csv->data as $key => $row ) {
 
 		$new_row = array();
@@ -294,56 +291,57 @@ function edd_process_csv_import() {
 			$i++;
 			continue;
 		}
+	}
 
 
+	// Featured image
+	$image_key			= array_search( $csv_fields['_edd_images'], $headers );
+	$image = false;
 
-		$image = false;
+	// TODO: doesn't work
 
-		// TODO: doesn't work
+	// Set featured images
+	if( $image_key && !empty( $new_row[ $image_key ] ) ) {
 
-		// Set featured images
-		if( $image_key && !empty( $new_row[ $image_key ] ) ) {
+		require_once ABSPATH . 'wp-admin/includes/image.php';
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		require_once ABSPATH . 'wp-admin/includes/media.php';
 
-			require_once ABSPATH . 'wp-admin/includes/image.php';
-			require_once ABSPATH . 'wp-admin/includes/file.php';
-			require_once ABSPATH . 'wp-admin/includes/media.php';
+		$image = true;
+		$image_file = $new_row[ $image_key ];
+		$image_details = parse_url( $image_file );
 
-			$image = true;
-			$image_file = $new_row[ $image_key ];
-			$image_details = parse_url( $image_file );
+		if( ! $image_details || ! isset( $image_details['scheme'] ) || 'http' != $image_details['scheme'] || 'https' != $image_details['scheme'] ) {
+			// Set preferred path for file hosting
+			$search_base_path = trailingslashit( WP_CONTENT_DIR );
+			$preferred_path = $search_base_path . 'uploads/edd/' . $image_file;
 
-			if( ! $image_details || ! isset( $image_details['scheme'] ) || 'http' != $image_details['scheme'] || 'https' != $image_details['scheme'] ) {
-				// Set preferred path for file hosting
-				$search_base_path = trailingslashit( WP_CONTENT_DIR );
-				$preferred_path = $search_base_path . 'uploads/edd/' . $image_file;
-
-				if( file_exists( $preferred_path ) ) {
-					// Check /wp-content/uploads/edd/$file
+			if( file_exists( $preferred_path ) ) {
+				// Check /wp-content/uploads/edd/$file
+				$file_path = $preferred_path;
+			} elseif( file_exists( $search_base_path . $image_file ) ) {
+				// Check /wp-content/$file
+				if( move_uploaded_file( $search_base_path . $image_file, $preferred_path ) ) {
 					$file_path = $preferred_path;
-				} elseif( file_exists( $search_base_path . $image_file ) ) {
-					// Check /wp-content/$file
-					if( move_uploaded_file( $search_base_path . $image_file, $preferred_path ) ) {
-						$file_path = $preferred_path;
-					} else {
-						$file_path = $search_base_path . $image_file;
-					}
-				} elseif( file_exists( $search_base_path . 'uploads/' . $image_file ) ) {
-					// Check /wp-content/uploads/$file
-					if( move_uploaded_file( $search_base_path . 'uploads/' . $image_file, $preferred_path ) ) {
-						$file_path = $preferred_path;
-					} else {
-						$file_path = $search_base_path . 'uploads/' . $image_file;
-					}
 				} else {
-					// Error
-					$image = false;
-					$file_errors[] = array(
-						'row'  => $i + 1,
-						'file' => $image_key
-					);
+					$file_path = $search_base_path . $image_file;
 				}
+			} elseif( file_exists( $search_base_path . 'uploads/' . $image_file ) ) {
+				// Check /wp-content/uploads/$file
+				if( move_uploaded_file( $search_base_path . 'uploads/' . $image_file, $preferred_path ) ) {
+					$file_path = $preferred_path;
+				} else {
+					$file_path = $search_base_path . 'uploads/' . $image_file;
+				}
+			} else {
+				// Error
+				$image = false;
+				$file_errors[] = array(
+					'row'  => $i + 1,
+					'file' => $image_key
+				);
 			}
-
+		
 			// Store file in array for use later
 			$final_images[] = array(
 				'name' => basename( $file_path ),
@@ -353,7 +351,6 @@ function edd_process_csv_import() {
 		}
 
 
-		// Check /wp-content/uploads/edd/$file
 		$post_id = wp_insert_post( $post_data );
 
 		// Make sure it was created
@@ -404,7 +401,7 @@ function edd_process_csv_import() {
 					exit;
 				}
 			}
-
+ 
 			// Set tags
 			if( $tags_key && !empty( $new_row[ $tags_key ] ) ) {
 
