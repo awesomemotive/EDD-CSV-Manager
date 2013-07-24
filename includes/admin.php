@@ -440,19 +440,19 @@ function edd_csv_get_fields( $parent ) {
 		''							=> 'Unmapped',
 		'post_author'				=> 'Author ID',
 		'_edd_button_behavior'		=> 'Button Behavior',
+		'categories'			    => 'Categories',
 		'post_date'					=> 'Date Created',
 		'post_content'				=> 'Description',
-		'post_title'				=> 'Download Name',
-		'post_excerpt'				=> 'Excerpt',
-		'post_name'					=> 'Post Name',
-		'post_status'				=> 'Status',
-		'categories'			    => 'Categories',
-		'tags'					    => 'Tags',
 		'_edd_files'				=> 'Download Files',
 		'_edd_download_limit'		=> 'Download Limit',
 		'_edd_hide_purchase_link'	=> 'Hide Purchase Link',
 		'_edd_images'				=> 'Image Files',
+		'post_excerpt'				=> 'Excerpt',
+		'post_name'					=> 'Post Name',
 		'_edd_price'				=> 'Price'
+		'post_title'				=> 'Product Name',
+		'post_status'				=> 'Status',
+		'tags'					    => 'Tags',
 	);
 
 	$return = '';
