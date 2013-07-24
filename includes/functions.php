@@ -108,7 +108,21 @@ function edd_csv_error_handler( $errno ) {
 					$data .= sprintf( __( '<br />&middot; The file %s cannot be found on line %s.', 'edd-csv-importer' ), $file['file'], $file['row'] );
 				}
 			}
+			delete_transient( 'edd_file_errors' );
 			break;
+		case '4':
+			$error = __( 'Error adding image attachment!', 'edd-csv-importer' );
+			$image_errors = get_transient( 'edd_image_errors' );
+			if( $image_errors ) {
+				$image_errors = maybe_unserialize( $image_errors );
+
+				foreach( $image_errors as $file ) {
+					$data .= sprintf( __( '<br />&middot; The image %s could not be attached!', 'edd-csv-importer' ), $file['file'] );
+				}
+			}
+			delete_transient( 'edd_image_errors' );
+			break;
+
 
 	}
 
@@ -125,6 +139,9 @@ function edd_csv_error_handler( $errno ) {
 function edd_csv_cleanup() {
 	if( get_transient( 'edd_file_errors' ) )
 		delete_transient( 'edd_file_errors' );
+
+	if( get_transient( 'edd_image_errors' ) )
+		delete_transient( 'edd_image_errors' );
 
 	if( get_transient( 'edd_csv_headers' ) )
 		delete_transient( 'edd_csv_headers' );

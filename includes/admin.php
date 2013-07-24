@@ -345,9 +345,10 @@ function edd_process_csv_import() {
 			}
 
 			// Store file in array for use later
-			$final_files[] = array(
+			$final_images[] = array(
 				'name' => basename( $file_path ),
-				'file' => str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $file_path )
+				'path' => $file_path,
+				'url' => str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $file_path )
 			);
 		}
 
@@ -377,9 +378,31 @@ function edd_process_csv_import() {
 
 			// Attach image
 			if( $image ) {
-				$attachment_id = wp_handle_upload( $file_path, $post_id );
-				update_post_meta( $post_id, '_thumbnail_id', $attachment_id );
+				$filetype = wp_check_filetype( $final_images[0]['name'], null );
 
+				$attachment = array(
+					'guid'				=> $final_images[0]['url'],
+					'post_mime_type'	=> $filetype['type'],
+					'post_title'		=> preg_replace( '/\.[^.]+$/', '', $final_images[0]['name'] ),
+					'post_content'		=> '',
+					'post_status'		=> 'inherit',
+					'post_parent'		=> $post_id
+				);
+
+				$attachment_id = wp_insert_attachment( $attachment, $final_images[0]['path'], $post_id );
+
+				if( !is_wp_error( $attachment_id ) && $attachment_id ) {
+					update_post_meta( $post_id, '_thumbnail_id', $attachment_id );
+
+					$attachment_data = wp_generate_attachment_metadata( $attachment_id, $final_images[0]['path'] );
+					wp_update_attachment_metadata( $attachment_id, $attachment_data );
+				} else {
+					$image_errors = serialize( $final_images[0]['path'] );
+					set_transient( 'edd_image_errors', $image_errors );
+
+					wp_redirect( add_query_arg( array( 'step' => '1', 'errno' => '4' ) ) );
+					exit;
+				}
 			}
 
 			// Set tags
