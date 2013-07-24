@@ -472,7 +472,7 @@ function edd_csv_get_fields( $parent ) {
 		'_edd_images'				=> 'Image Files',
 		'post_excerpt'				=> 'Excerpt',
 		'post_name'					=> 'Post Name',
-		'_edd_price'				=> 'Price'
+		'_edd_price'				=> 'Price',
 		'post_title'				=> 'Product Name',
 		'post_status'				=> 'Status',
 		'tags'					    => 'Tags',
