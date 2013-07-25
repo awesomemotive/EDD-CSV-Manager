@@ -294,13 +294,14 @@ function edd_process_csv_import() {
 
 
 		// Featured image
-		$image_key			= array_search( $csv_fields['_edd_images'], $headers );
-		$image = false;
+		$image_key     = array_search( $csv_fields['_edd_images'], $headers );
+		$image         = false;
+		$final_images  = array();
 
 		// TODO: doesn't work
 
 		// Set featured images
-		if( $image_key && !empty( $new_row[ $image_key ] ) && $image ) {
+		if( $image_key && !empty( $new_row[ $image_key ] ) ) {
 
 			require_once ABSPATH . 'wp-admin/includes/image.php';
 			require_once ABSPATH . 'wp-admin/includes/file.php';
@@ -340,14 +341,13 @@ function edd_process_csv_import() {
 						'file' => $image_key
 					);
 				}
-
-				// Store file in array for use later
-				$final_images[] = array(
-					'name' => basename( $file_path ),
-					'path' => $file_path,
-					'url' => str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $file_path )
-				);
 			}
+			// Store file in array for use later
+			$final_images[] = array(
+				'name' => basename( $file_path ),
+				'path' => $file_path,
+				'url' => str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $file_path )
+			);
 		}
 
 		$post_id = wp_insert_post( $post_data );
