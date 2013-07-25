@@ -441,7 +441,7 @@ function edd_process_csv_import() {
 		wp_redirect( add_query_arg( array( 'step' => '1', 'errno' => '3' ) ) );
 		exit;
 	}
-	exit;
+	die( 'import successful' );
 
 }
 
