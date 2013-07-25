@@ -310,7 +310,7 @@ function edd_process_csv_import() {
 			$image_file = $new_row[ $image_key ];
 			$image_details = parse_url( $image_file );
 
-			if( ! $image_details || ! isset( $image_details['scheme'] ) || 'http' != $image_details['scheme'] || 'https' != $image_details['scheme'] ) {
+			if( ! $image_details || ! isset( $image_details['scheme'] ) || ( 'http' != $image_details['scheme'] && 'https' != $image_details['scheme'] ) ) {
 				// Set preferred path for file hosting
 				$search_base_path = trailingslashit( WP_CONTENT_DIR );
 				$preferred_path = $search_base_path . 'uploads/edd/' . $image_file;
