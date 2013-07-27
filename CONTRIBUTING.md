@@ -1,4 +1,4 @@
-#Contribute To EDD CSV Importer
+#Contribute To EDD CSV Manager
 
 Community made patches, localisations, bug reports and contributions are always welcome.
 
@@ -7,7 +7,7 @@ When contributing please ensure you follow the guidelines below so that we can k
 ## Getting Started
 
 * Submit a ticket for your issue, assuming one does not already exist.
-  * Raise it on our [Issue Tracker](https://github.com/easydigitaldownloads/EDD-CSV-Importer/issues)
+  * Raise it on our [Issue Tracker](https://github.com/easydigitaldownloads/EDD-CSV-Manager/issues)
   * Clearly describe the issue including steps to reproduce the bug.
   * Make sure you fill in the earliest version that you know has the issue as well as the version of WordPress you're using.
 
@@ -17,7 +17,7 @@ When contributing please ensure you follow the guidelines below so that we can k
 * Make the changes to your forked repository
   * Ensure you stick to the [WordPress Coding Standards](http://codex.wordpress.org/WordPress_Coding_Standards)
 * When committing, reference your issue (if present) and include a note about the fix
-* Push the changes to your fork and submit a pull request to the 'master' branch of the EDD CSV Importer repository
+* Push the changes to your fork and submit a pull request to the 'master' branch of the EDD CSV Manager repository
 
 ## Code Documentation
 
