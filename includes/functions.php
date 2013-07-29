@@ -54,11 +54,23 @@ function edd_csv_error_handler( $errno ) {
             if( $image_errors ) {
                 $image_errors = maybe_unserialize( $image_errors );
 
-                foreach( $image_errors as $file ) {
-                    $data .= sprintf( __( '<br />&middot; The image %s could not be attached!', 'edd-csv-manager' ), $file['file'] );
+                foreach( $image_errors as $image ) {
+                    $data .= sprintf( __( '<br />&middot; The image %s could not be attached!', 'edd-csv-manager' ), $image['file'] );
                 }
             }
             delete_transient( 'edd_image_errors' );
+            break;
+        case '5':
+            $error = __( 'Featured image has invalid permissions!', 'edd-csv-manager' );
+            $image_errors = get_transient( 'edd_image_perms_errors' );
+            if( $image_errors ) {
+                $image_errors = maybe_unserialize( $image_errors );
+
+                foreach( $image_errors as $image ) {
+                    $data .= sprintf( __( '<br />&middot; The image %s has invalid permissions!', 'edd-csv-manater' ), $image['file'] );
+                }
+            }
+            delete_transient( 'edd_image_perms_errors' );
             break;
 
 
