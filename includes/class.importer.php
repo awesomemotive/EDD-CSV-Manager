@@ -286,10 +286,10 @@ if( !class_exists( 'EDD_CSV_Importer' ) ) {
          * Handle mapping of CSV fields to EDD fields
          *
          * @since       1.0.0
-         * @access      private
+         * @access      public
          * @return      void
          */
-        private function map() {
+        public function map() {
             if( empty( $_POST['edd_import_nonce'] ) ) return;
 
             if( !wp_verify_nonce( $_POST['edd_import_nonce'], 'edd_import_nonce' ) ) return;
@@ -299,7 +299,7 @@ if( !class_exists( 'EDD_CSV_Importer' ) ) {
             // Invert the array... array_flip ftw!
             $fields = array_flip( $_POST['csv_fields'] );
 
-            if( map_has_duplicates( $_POST['csv_fields'] ) ) {
+            if( $this->map_has_duplicates( $_POST['csv_fields'] ) ) {
                 wp_redirect( add_query_arg( array( 'step' => '2', 'errno' => '1' ) ) );
                 exit;
             }
