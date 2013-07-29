@@ -168,7 +168,7 @@ if( !class_exists( 'EDD_CSV_Exporter' ) ) {
                 $hide_purchase_link = get_post_meta( $download->ID, '_edd_hide_purchase_link', true );
 
                 $image_id           = get_post_thumbnail_id( $download->ID );
-                $image_details     = wp_get_attachment_image_src( $image_id );
+                $image_details      = wp_get_attachment_image_src( $image_id );
 
                 $row = array(
                     $post_id,
