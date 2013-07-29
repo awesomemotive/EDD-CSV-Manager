@@ -200,6 +200,9 @@ if( !class_exists( 'EDD_CSV_Exporter' ) ) {
             }
 
             fclose( $csv );
+
+            // Exit needed to prevent 'junk' in CSV output
+            exit;
         }
 
 
