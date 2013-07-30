@@ -30,7 +30,6 @@ if( !class_exists( 'EDD_CSV_Exporter' ) ) {
         public static function instance() {
             if( !self::$instance ) {
                 self::$instance = new EDD_CSV_Exporter();
-                self::$instance->includes();
                 self::$instance->init();
             }
 
@@ -51,18 +50,6 @@ if( !class_exists( 'EDD_CSV_Exporter' ) ) {
 
             // Process export
             add_action( 'edd_export_csv', array( $this, 'export' ) );
-        }
-
-
-        /**
-         * Include required files
-         *
-         * @since       1.0.0
-         * @access      private
-         * @return      void
-         */
-        private function includes() {
-            require_once EDD_CSV_MANAGER_DIR . 'includes/libraries/zip_min.lib.php';
         }
 
 
