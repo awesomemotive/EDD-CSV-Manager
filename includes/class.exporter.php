@@ -30,6 +30,7 @@ if( !class_exists( 'EDD_CSV_Exporter' ) ) {
         public static function instance() {
             if( !self::$instance ) {
                 self::$instance = new EDD_CSV_Exporter();
+                self::$instance->includes();
                 self::$instance->init();
             }
 
@@ -54,6 +55,18 @@ if( !class_exists( 'EDD_CSV_Exporter' ) ) {
 
 
         /**
+         * Include required files
+         *
+         * @since       1.0.0
+         * @access      private
+         * @return      void
+         */
+        private function includes() {
+            require_once EDD_CSV_MANAGER_DIR . 'includes/libraries/zip_min.lib.php';
+        }
+
+
+        /**
          * Add metabox
          *
          * @since       1.0.0
@@ -65,13 +78,20 @@ if( !class_exists( 'EDD_CSV_Exporter' ) ) {
             echo '<h3><span>' . __( 'Export Products to CSV', 'edd-csv-manager' ) . '</span></h3>';
             echo '<div class="inside">';
             echo '<p>' . __( 'Export products from your Easy Digital Downloads site to a .csv file.', 'edd-csv-manager' ) . '</p>';
+            if( class_exists( 'ZipArchive' ) ) {
+                echo '<form method="post" enctype="multipart/form-data" action="' . admin_url( 'tools.php?page=edd-settings-export-import' ) . '">';
+                echo '<p>';
+                echo '<input type="hidden" name="download_files" value="true" />';
+                echo '<input type="hidden" name="edd_action" value="export_csv" />';
+                submit_button( __( 'Backup download files and images', 'edd-csv-manager' ), 'secondary', 'submit', false );
+                echo '</p>';
+                echo '</form>';
+            }
             echo '<form method="post" enctype="multipart/form-data" action="' . admin_url( 'tools.php?page=edd-settings-export-import' ) . '">';
-
             echo '<p>';
             echo '<input type="hidden" name="edd_action" value="export_csv" />';
             submit_button( __( 'Export', 'edd-csv-manager' ), 'secondary', 'submit', false );
             echo '</p>';
-
             echo '</form>';
             echo '</div>';
             echo '</div>';
@@ -89,7 +109,8 @@ if( !class_exists( 'EDD_CSV_Exporter' ) ) {
             if( !current_user_can( 'manage_options' ) )
                 wp_die( __( 'You do not have permission to export data.', 'edd-csv-manager' ), __( 'Error', 'edd-csv-manager' ) );
 
-            $this->set_download_headers();
+            if( isset( $_POST['download_files'] ) )
+                $download_files = true;
 
             // Set CSV header row data
             $headers = array(
@@ -117,6 +138,9 @@ if( !class_exists( 'EDD_CSV_Exporter' ) ) {
 
             // Get our list of downloads!
             $downloads = get_posts( array( 'post_type' => 'download', 'posts_per_page' => -1 ) );
+
+            $file_download_array = array();
+            $image_download_array = array();
 
             foreach( $downloads as $download ) {
                 $post_id        = $download->ID;
@@ -146,19 +170,18 @@ if( !class_exists( 'EDD_CSV_Exporter' ) ) {
                     $tags = implode( '|', $tags_array );
                 }
 
-                $price      = get_post_meta( $download->ID, 'edd_price', true );
+                $price = get_post_meta( $download->ID, 'edd_price', true );
 
                 $files_array = get_post_meta( $download->ID, 'edd_download_files' );
                 $files = '';
-                $download_array = array();
 
                 if( count( $files_array[0] ) == 1 ) {
                     $files = basename( $files_array[0][0]['file'] );
-                    $download_array[] = $files_array[0][0]['file'];
+                    $file_download_array[] = $files_array[0][0]['file'];
                 } elseif( count( $files_array[0] ) > 1 ) {
                     foreach( $files_array[0] as $file ) {
                         $file_array[] = basename( $file['file'] );
-                        $download_array[] = $file['file'];
+                        $file_download_array[] = $file['file'];
                     }
                     $files = implode( '|', $file_array );
                 }
@@ -169,6 +192,7 @@ if( !class_exists( 'EDD_CSV_Exporter' ) ) {
 
                 $image_id           = get_post_thumbnail_id( $download->ID );
                 $image_details      = wp_get_attachment_image_src( $image_id );
+                $image_download_array[] = $image_details[0];
 
                 $row = array(
                     $post_id,
@@ -192,18 +216,65 @@ if( !class_exists( 'EDD_CSV_Exporter' ) ) {
 
                 $data[] = $row;
             }
+            // Are we downloading files?
+            if( $download_files == true ) {
 
-            // Output data to CSV
-            $csv = fopen( 'php://output', 'w' );
+                $this->set_zip_download_headers();
 
-            foreach( $data as $fields ) {
-                fputcsv( $csv, $fields );
+                $zipFile = 'edd-export-product-backup-' . date( 'm-d-y' ) . '.zip';
+
+                $zip = new ZipArchive;
+                $zip->open( $zipFile, ZipArchive::CREATE );
+                
+                foreach ( $image_download_array as $image ) {
+                    $zip->addFile( str_replace( WP_CONTENT_URL, WP_CONTENT_DIR, $image ), 'images/' . basename( $image ) );
+                }
+
+                foreach( $file_download_array as $file ) {
+                    $zip->addFile( str_replace( WP_CONTENT_URL, WP_CONTENT_DIR, $file ), 'products/' . basename( $file ) );
+                }
+
+                $zip->close();
+
+                readfile( $zipFile );
+
+                exit;
+            } else {
+
+                $this->set_csv_download_headers();
+
+                // Output data to CSV
+                $csv = fopen( 'php://output', 'w' );
+
+                foreach( $data as $fields ) {
+                    fputcsv( $csv, $fields );
+                }
+
+                fclose( $csv );
+
+                // Exit needed to prevent 'junk' in CSV output
+                exit;
             }
+        }
 
-            fclose( $csv );
 
-            // Exit needed to prevent 'junk' in CSV output
-            exit;
+        /**
+         * Set headers for ZIP downloads
+         *
+         * @since       1.0.0
+         * @access      public
+         * @return      void
+         */
+        public function set_zip_download_headers() {
+            ignore_user_abort( true );
+
+            if( !edd_is_func_disabled( 'set_time_limit' ) && !ini_get( 'safe_mode' ) ) set_time_limit( 0 );
+
+            nocache_headers();
+
+            header( 'Content-type: application/octet-stream' );
+            header( 'Content-disposition: attachment; filename=edd-export-product-backup-' . date( 'm-d-y' ) . '.zip' );
+            header( 'Expires: -1' );
         }
 
 
@@ -214,7 +285,7 @@ if( !class_exists( 'EDD_CSV_Exporter' ) ) {
          * @access      public
          * @return      void
          */
-        public function set_download_headers() {
+        public function set_csv_download_headers() {
             ignore_user_abort( true );
 
             if( !edd_is_func_disabled( 'set_time_limit' ) && !ini_get( 'safe_mode' ) ) set_time_limit( 0 );

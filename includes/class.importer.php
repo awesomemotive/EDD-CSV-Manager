@@ -96,7 +96,7 @@ if( !class_exists( 'EDD_CSV_Importer' ) ) {
                 $this->cleanup();
 
                 echo '<p><input type="file" name="import_file" /></p>';
-                echo '<p><label for="has_headers"><input type="checkbox" name="has_headers" checked="yes" /> ' . __( 'Does the CSV include a header row?', 'edd-csv-manager' ) . '</label></p>';
+                echo '<p><label for="has_headers"><input type="checkbox" id="has_headers" name="has_headers" checked="yes" /> ' . __( 'Does the CSV include a header row?', 'edd-csv-manager' ) . '</label></p>';
                 echo '<p>';
                 echo '<input type="hidden" name="edd_action" value="upload_csv" />';
                 wp_nonce_field( 'edd_import_nonce', 'edd_import_nonce' );
