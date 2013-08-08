@@ -537,7 +537,8 @@ if( !class_exists( 'EDD_CSV_Importer' ) ) {
                     $final_images[] = array(
                         'name'  => basename( $file_path ),
                         'path'  => $file_path,
-                        'url'   => str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $file_path )
+                        'url'   => $is_url ? $image_file : str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $file_path )
+
                     );
                 }
 
