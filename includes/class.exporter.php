@@ -98,8 +98,8 @@ if( !class_exists( 'EDD_CSV_Exporter' ) ) {
             if( !current_user_can( 'manage_options' ) )
                 wp_die( __( 'You do not have permission to export data.', 'edd-csv-manager' ), __( 'Error', 'edd-csv-manager' ) );
 
-            if( isset( $_POST['download_files'] ) )
-                $download_files = true;
+            // Should files be compressed and downloaded?
+            $download_files = isset( $_POST['download_files'] );
 
             // Set CSV header row data
             $headers = array(
@@ -164,23 +164,27 @@ if( !class_exists( 'EDD_CSV_Exporter' ) ) {
                 $files_array = get_post_meta( $download->ID, 'edd_download_files' );
                 $files = '';
 
-                if( count( $files_array[0] ) == 1 ) {
-                    if( strpos( $files_array[0][0]['file'], site_url() ) !== false ) {
-                        $files = basename( $files_array[0][0]['file'] );
-                    } else {
-                        $files = $files_array[0][0]['file'];
-                    }
-                    $file_download_array[] = $files_array[0][0]['file'];
-                } elseif( count( $files_array[0] ) > 1 ) {
-                    foreach( $files_array[0] as $file ) {
-                        if( strpos( $file['file'], site_url() ) !== false ) {
-                            $file_array[] = basename( $file['file'] );
+                if( ! empty( $files_array ) ) {
+
+                    if( count( $files_array[0] ) == 1 ) {
+                        if( strpos( $files_array[0][0]['file'], site_url() ) !== false ) {
+                            $files = basename( $files_array[0][0]['file'] );
                         } else {
-                            $file_array[] = $file['file'];
+                            $files = $files_array[0][0]['file'];
                         }
-                        $file_download_array[] = $file['file'];
+                        $file_download_array[] = $files_array[0][0]['file'];
+                    } elseif( count( $files_array[0] ) > 1 ) {
+                        foreach( $files_array[0] as $file ) {
+                            if( strpos( $file['file'], site_url() ) !== false ) {
+                                $file_array[] = basename( $file['file'] );
+                            } else {
+                                $file_array[] = $file['file'];
+                            }
+                            $file_download_array[] = $file['file'];
+                        }
+                        $files = implode( '|', $file_array );
                     }
-                    $files = implode( '|', $file_array );
+
                 }
 
                 $download_limit     = get_post_meta( $download->ID, '_edd_download_limit', true );
@@ -214,7 +218,7 @@ if( !class_exists( 'EDD_CSV_Exporter' ) ) {
                 $data[] = $row;
             }
             // Are we downloading files?
-            if( $download_files == true ) {
+            if( $download_files ) {
 
                 $this->set_zip_download_headers();
 
@@ -223,12 +227,16 @@ if( !class_exists( 'EDD_CSV_Exporter' ) ) {
                 $zip = new ZipArchive;
                 $zip->open( $zipFile, ZipArchive::CREATE );
 
-                foreach ( $image_download_array as $image ) {
-                    $zip->addFile( str_replace( WP_CONTENT_URL, WP_CONTENT_DIR, $image ), 'images/' . basename( $image ) );
+                if( ! empty( $image_download_array ) ) {
+                    foreach ( $image_download_array as $image ) {
+                        $zip->addFile( str_replace( WP_CONTENT_URL, WP_CONTENT_DIR, $image ), 'images/' . basename( $image ) );
+                    }
                 }
 
-                foreach( $file_download_array as $file ) {
-                    $zip->addFile( str_replace( WP_CONTENT_URL, WP_CONTENT_DIR, $file ), 'products/' . basename( $file ) );
+                if( ! empty( $file_download_array ) ) {
+                    foreach( $file_download_array as $file ) {
+                        $zip->addFile( str_replace( WP_CONTENT_URL, WP_CONTENT_DIR, $file ), 'products/' . basename( $file ) );
+                    }
                 }
 
                 $zip->close();
