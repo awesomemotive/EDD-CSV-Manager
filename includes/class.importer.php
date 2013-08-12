@@ -433,10 +433,7 @@ if( !class_exists( 'EDD_CSV_Importer' ) ) {
                     foreach( $files as $file ) {
                         $file_details = parse_url( $file );
 
-                        if( !$file_details || !isset( $file_details['scheme'] ) || ( 'http' != $file_details['scheme'] && 'https' != $file_details['scheme'] ) ) {
-
-                            $is_url = false;
-
+                        if( !$file_details || !isset( $file_details['scheme'] ) || ( 'http' != $file_details['scheme'] && 'https' != $file_details['scheme'] && strpos( $file, site_url() ) !== false ) ) {
                             // Set preferred path for file hosting
                             $search_base_path = trailingslashit( WP_CONTENT_DIR );
                             $preferred_path = $search_base_path . 'uploads/edd/' . $file;
@@ -465,15 +462,15 @@ if( !class_exists( 'EDD_CSV_Importer' ) ) {
                                     'file'  => $file
                                 );
                             }
-                        } else {
-                            $is_url = true;
-                        }
 
+                        } else {
+                            $file_path = $file;
+                        }
 
                         // Store file in array for later use
                         $final_files[] = array(
                             'name'  => basename( $file_path ),
-                            'file'  => $is_url ? $file : str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $file_path )
+                            'file'  => str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $file_path )
                         );
                     }
                 }
@@ -501,7 +498,7 @@ if( !class_exists( 'EDD_CSV_Importer' ) ) {
                     $image_file     = $new_row[ $image_key ];
                     $image_details  = parse_url( $image_file );
 
-                    if( !$image_details || !isset( $image_details['scheme'] ) || ( 'http' != $image_details['scheme'] && 'https' != $image_details['scheme'] ) ) {
+                    if( !$image_details || !isset( $image_details['scheme'] ) || ( 'http' != $image_details['scheme'] && 'https' != $image_details['scheme'] && strpos( $image_file, site_url() ) !== false ) ) {
                         // Set preferred path for file hosting
                         $search_base_path = trailingslashit( WP_CONTENT_DIR );
                         $preferred_path = $search_base_path . 'uploads/edd/' . $image_file;
@@ -531,14 +528,15 @@ if( !class_exists( 'EDD_CSV_Importer' ) ) {
                                 'file'  => $image_key
                             );
                         }
+                    } else {
+                        $file_path = $image_file;
                     }
 
                     // Store image in array for later use
                     $final_images[] = array(
                         'name'  => basename( $file_path ),
                         'path'  => $file_path,
-                        'url'   => $is_url ? $image_file : str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $file_path )
-
+                        'url'   => str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $file_path )
                     );
                 }
 
@@ -560,6 +558,10 @@ if( !class_exists( 'EDD_CSV_Importer' ) ) {
 
                     if( $hide_link && !empty( $new_row[ $hide_link ] ) )
                         update_post_meta( $post_id, '_edd_hide_purchase_link', $new_row[ $hide_link ] );
+
+                    if( !empty( $final_files ) )
+                        update_post_meta( $post_id, 'edd_download_files', $final_files );
+
 
                     // Attach image
                     if( $image ) {

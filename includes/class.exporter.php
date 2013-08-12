@@ -165,11 +165,19 @@ if( !class_exists( 'EDD_CSV_Exporter' ) ) {
                 $files = '';
 
                 if( count( $files_array[0] ) == 1 ) {
-                    $files = basename( $files_array[0][0]['file'] );
+                    if( strpos( $files_array[0][0]['file'], site_url() ) !== false ) {
+                        $files = basename( $files_array[0][0]['file'] );
+                    } else {
+                        $files = $files_array[0][0]['file'];
+                    }
                     $file_download_array[] = $files_array[0][0]['file'];
                 } elseif( count( $files_array[0] ) > 1 ) {
                     foreach( $files_array[0] as $file ) {
-                        $file_array[] = basename( $file['file'] );
+                        if( strpos( $file['file'], site_url() ) !== false ) {
+                            $file_array[] = basename( $file['file'] );
+                        } else {
+                            $file_array[] = $file['file'];
+                        }
                         $file_download_array[] = $file['file'];
                     }
                     $files = implode( '|', $file_array );
@@ -214,7 +222,7 @@ if( !class_exists( 'EDD_CSV_Exporter' ) ) {
 
                 $zip = new ZipArchive;
                 $zip->open( $zipFile, ZipArchive::CREATE );
-                
+
                 foreach ( $image_download_array as $image ) {
                     $zip->addFile( str_replace( WP_CONTENT_URL, WP_CONTENT_DIR, $image ), 'images/' . basename( $image ) );
                 }
