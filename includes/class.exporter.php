@@ -19,6 +19,8 @@ if( !class_exists( 'EDD_CSV_Exporter' ) ) {
 
         private static $instance;
 
+        private $page;
+
         /**
          * Get active instance
          *
@@ -45,8 +47,16 @@ if( !class_exists( 'EDD_CSV_Exporter' ) ) {
          * @return      void
          */
         private function init() {
+
+            if( version_compare( EDD_VERSION, '1.8', '<' ) ) {
+                $this->page = 'edit.php?post_type=download&page=edd-tools';
+            } else {
+                $this->page = 'tools.php?page=edd-settings-export-import';
+            }
+
             // Add metabox
             add_action( 'edd_export_import_top', array( $this, 'add_metabox' ) );
+            add_action( 'edd_tools_before', array( $this, 'add_metabox' ) );
 
             // Process export
             add_action( 'edd_export_csv', array( $this, 'export' ) );
@@ -65,7 +75,7 @@ if( !class_exists( 'EDD_CSV_Exporter' ) ) {
             echo '<h3><span>' . __( 'Export Products to CSV', 'edd-csv-manager' ) . '</span></h3>';
             echo '<div class="inside">';
             echo '<p>' . __( 'Export products from your Easy Digital Downloads site to a .csv file.', 'edd-csv-manager' ) . '</p>';
-            echo '<form method="post" enctype="multipart/form-data" action="' . admin_url( 'tools.php?page=edd-settings-export-import' ) . '">';
+            echo '<form method="post" enctype="multipart/form-data" action="' . admin_url( $this->page ) . '">';
             echo '<p>';
             echo '<input type="hidden" name="edd_action" value="export_csv" />';
             submit_button( __( 'Export', 'edd-csv-manager' ), 'secondary', 'submit', false );
@@ -74,7 +84,7 @@ if( !class_exists( 'EDD_CSV_Exporter' ) ) {
             if( class_exists( 'ZipArchive' ) ) {
                 echo '<div style="background-color: #fff; border: 1px solid #dfdfdf; border-radius: 3px; -webkit-border-radius: 3px; padding: 0 10px 0 10px; max-width: 350px;">';
                 echo '<p>' . sprintf( __( 'Download an archive of your %s files and images as a ZIP for migration to a new server.', 'edd-csv-manager' ), strtolower( edd_get_label_singular() ) ) . '</p>';
-                echo '<form method="post" enctype="multipart/form-data" action="' . admin_url( 'tools.php?page=edd-settings-export-import' ) . '">';
+                echo '<form method="post" enctype="multipart/form-data" action="' . admin_url( $this->page ) . '">';
                 echo '<input type="hidden" name="download_files" value="true" />';
                 echo '<input type="hidden" name="edd_action" value="export_csv" />';
                 submit_button( sprintf( __( 'Backup %s files and images', 'edd-csv-manager' ), strtolower( edd_get_label_singular() ) ), 'secondary', 'submit', false );
