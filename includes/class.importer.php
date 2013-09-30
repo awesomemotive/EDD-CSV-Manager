@@ -135,6 +135,13 @@ if( !class_exists( 'EDD_CSV_Importer' ) ) {
                     echo '<select name="csv_fields[' . $field_id . ']" >' . $this->get_fields( $field_label ) . '</select><br />';
                 }
 
+                if( class_exists( 'EDD_Amazon_S3' ) ) {
+                    echo '<p><label for="edd_import_s3">';
+                        echo '<input type="checkbox" value="1" name="edd_import_s3" id="edd_import_s3"/>&nbsp;';
+                        echo __( 'Are your download files stored on Amazon S3?', 'edd-csv-manager' );
+                    echo '</label></p>';
+                }
+
                 echo '<p><input type="hidden" name="edd_action" value="map_csv" />';
                 wp_nonce_field( 'edd_import_nonce', 'edd_import_nonce' );
                 submit_button( __( 'Import', 'edd-csv-manager' ), 'secondary', 'submit', false );
@@ -443,7 +450,17 @@ if( !class_exists( 'EDD_CSV_Importer' ) ) {
                     foreach( $files as $file ) {
                         $file_details = parse_url( $file );
 
-                        if( !$file_details || !isset( $file_details['scheme'] ) || ( 'http' != $file_details['scheme'] && 'https' != $file_details['scheme'] && strpos( $file, site_url() ) !== false ) ) {
+                        if(
+                            (
+                                ! $file_details ||
+                                ! isset( $file_details['scheme'] ) ||
+                                (
+                                    'http' != $file_details['scheme'] &&
+                                    'https' != $file_details['scheme'] &&
+                                    strpos( $file, site_url() ) !== false
+                                )
+                            ) && ! isset( $_POST['edd_import_s3'] )
+                        ) {
                             // Set preferred path for file hosting
                             $search_base_path = trailingslashit( WP_CONTENT_DIR );
                             $preferred_path = $search_base_path . 'uploads/edd/' . $file;
@@ -474,7 +491,7 @@ if( !class_exists( 'EDD_CSV_Importer' ) ) {
                             }
 
                         } else {
-                            $file_path = $file;
+                             $file_path = $file;
                         }
 
                         // Store file in array for later use
