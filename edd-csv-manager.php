@@ -3,7 +3,7 @@
  * Plugin Name:     Easy Digital Downloads - CSV Manager
  * Plugin URI:      http://easydigitaldownloads.com
  * Description:     Allows store owners to import products from or export products to a CSV file
- * Version:         1.0.5
+ * Version:         1.0.6
  * Author:          Daniel J Griffiths
  * Author URI:      http://ghost1227.com
  *
