@@ -50,9 +50,9 @@ if( !class_exists( 'EDD_CSV_Importer' ) ) {
         private function init() {
 
             if( version_compare( EDD_VERSION, '1.8', '<' ) ) {
-                $this->page = 'edit.php?post_type=download&page=edd-tools';
-            } else {
                 $this->page = 'tools.php?page=edd-settings-export-import';
+            } else {
+                $this->page = 'edit.php?post_type=download&page=edd-tools';
             }
 
             // Add metabox
