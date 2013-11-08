@@ -31,15 +31,26 @@ if( !class_exists( 'EDD_CSV_Manager' ) ) {
         public static function instance() {
             if( !self::$instance ) {
                 self::$instance = new EDD_CSV_Manager();
-                self::$instance->setup_constants();
-                self::$instance->includes();
-                self::$instance->load_textdomain();
-                self::$instance->exporter();
-                self::$instance->importer();
             }
 
             return self::$instance;
-        }
+		}
+
+
+		/**
+		 * Class constructor
+		 *
+		 * @since		1.0.7
+		 * @access		public
+		 * @return		void
+		 */
+		public function __construct() {
+            $this->setup_constants();
+            $this->includes();
+            $this->load_textdomain();
+            $this->exporter();
+            $this->importer();
+		}
 
 
         /**
@@ -138,9 +149,10 @@ if( !class_exists( 'EDD_CSV_Manager' ) ) {
 }
 
 
-function EDD_CSV() {
-    return EDD_CSV_Manager::instance();
-}
+function edd_csv_manager_load() {
+	// Make sure EDD is active
+	if( !class_exists( 'Easy_Digital_Downloads' ) ) return;
 
-// Off we go!
-EDD_CSV();
+	$edd_csv_manager = new EDD_CSV_Manager();
+}
+add_action( 'plugins_loaded', 'edd_csv_manager_load' );
