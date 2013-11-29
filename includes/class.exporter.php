@@ -128,7 +128,8 @@ if( !class_exists( 'EDD_CSV_Exporter' ) ) {
                 '_edd_download_limit',
                 '_edd_button_behavior',
                 '_edd_hide_purchase_link',
-                '_edd_images'
+				'_edd_images',
+				'edd_sku'
             );
 
             $headers = apply_filters( 'edd_csv_export_headers', $headers );
@@ -199,7 +200,8 @@ if( !class_exists( 'EDD_CSV_Exporter' ) ) {
 
                 $download_limit     = get_post_meta( $download->ID, '_edd_download_limit', true );
                 $button_behavior    = get_post_meta( $download->ID, '_edd_button_behavior', true );
-                $hide_purchase_link = get_post_meta( $download->ID, '_edd_hide_purchase_link', true );
+				$hide_purchase_link = get_post_meta( $download->ID, '_edd_hide_purchase_link', true );
+				$edd_sku            = get_post_meta( $download->ID, 'edd_sku', true );
 
                 $image_id           = get_post_thumbnail_id( $download->ID );
                 $image_details      = wp_get_attachment_image_src( $image_id );
@@ -220,8 +222,9 @@ if( !class_exists( 'EDD_CSV_Exporter' ) ) {
                     $files,
                     $download_limit,
                     $button_behavior,
-                    $hide_purchase_link,
-                    $image_details[0]
+					$hide_purchase_link,
+                    $image_details[0],
+					$edd_sku
                 );
                 $row = apply_filters( 'edd_csv_export_row', $row );
 

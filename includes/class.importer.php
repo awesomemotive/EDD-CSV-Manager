@@ -195,7 +195,8 @@ if( !class_exists( 'EDD_CSV_Importer' ) ) {
                 '_edd_price'                => __( 'Price', 'edd-csv-manager' ),
                 'post_title'                => __( 'Product Name', 'edd-csv-manager' ),
                 'post_status'               => __( 'Status', 'edd-csv-manager' ),
-                'tags'                      => __( 'Tags', 'edd-csv-manager' )
+				'tags'                      => __( 'Tags', 'edd-csv-manager' ),
+				'edd_sku'                   => __( 'SKU', 'edd-csv-manager' )
             );
 
             $fields = apply_filters( 'edd_csv_fields', $fields );
@@ -376,7 +377,8 @@ if( !class_exists( 'EDD_CSV_Importer' ) ) {
                 '_edd_download_limit'       => '',
                 '_edd_button_behavior'      => '',
                 '_edd_hide_purchase_link'   => '',
-                '_edd_images'               => ''
+				'_edd_images'               => '',
+				'edd_sku'                   => ''
             );
 
             $defaults = apply_filters( 'edd_csv_default_fields', $defaults );
@@ -407,6 +409,7 @@ if( !class_exists( 'EDD_CSV_Importer' ) ) {
             $dl_limit_key       = array_search( $csv_fields['_edd_download_limit'], $headers );
             $button_behavior    = array_search( $csv_fields['_edd_button_behavior'], $headers );
             $hide_link          = array_search( $csv_fields['_edd_hide_purchase_link'], $headers );
+			$edd_sku            = array_search( $csv_fields['edd_sku'], $headers );
 
             // Categories
             $categories_key     = array_search( $csv_fields['categories'], $headers );
@@ -585,6 +588,9 @@ if( !class_exists( 'EDD_CSV_Importer' ) ) {
 
                     if( $hide_link && !empty( $new_row[ $hide_link ] ) )
                         update_post_meta( $post_id, '_edd_hide_purchase_link', $new_row[ $hide_link ] );
+
+					if( $edd_sku && !empty( $new_row[ $edd_sku ] ) )
+						update_post_meta( $post_id, 'edd_sku', $new_row[ $edd_sku ] );
 
                     if( !empty( $final_files ) )
                         update_post_meta( $post_id, 'edd_download_files', $final_files );
