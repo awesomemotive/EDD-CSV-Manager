@@ -49,15 +49,13 @@ if( !class_exists( 'EDD_CSV_Importer' ) ) {
          */
         private function init() {
 
-            if( version_compare( EDD_VERSION, '1.8', '<' ) ) {
+            if( version_compare( EDD_VERSION, '1.9.5', '<' ) ) {
                 $this->page = 'tools.php?page=edd-settings-export-import';
+	            add_action( 'edd_tools_before', array( $this, 'add_metabox' ) );
             } else {
                 $this->page = 'edit.php?post_type=download&page=edd-tools';
+				add_action( 'edd_import_export_before', array( $this, 'add_metabox' ) );
             }
-
-            // Add metabox
-            add_action( 'edd_export_import_top', array( $this, 'add_metabox' ) );
-            add_action( 'edd_tools_before', array( $this, 'add_metabox' ) );
 
             // Handle uploading of a CSV
             add_action( 'edd_upload_csv', array( $this, 'upload' ) );
