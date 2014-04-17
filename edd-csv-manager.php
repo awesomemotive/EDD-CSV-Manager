@@ -48,8 +48,9 @@ if( !class_exists( 'EDD_CSV_Manager' ) ) {
             $this->setup_constants();
             $this->includes();
             $this->load_textdomain();
-            $this->exporter();
-            $this->importer();
+            $this->settings_exporter();
+            $this->settings_importer();
+            $this->payment_history_importer();
 		}
 
 
@@ -86,6 +87,7 @@ if( !class_exists( 'EDD_CSV_Manager' ) ) {
             require_once EDD_CSV_MANAGER_DIR . 'includes/functions.php';
             require_once EDD_CSV_MANAGER_DIR . 'includes/class.settings-exporter.php';
             require_once EDD_CSV_MANAGER_DIR . 'includes/class.settings-importer.php';
+            require_once EDD_CSV_MANAGER_DIR . 'includes/class.payment-history-importer.php';
         }
 
 
@@ -129,7 +131,7 @@ if( !class_exists( 'EDD_CSV_Manager' ) ) {
          * @access      private
          * @return      void
          */
-        public function exporter() {
+        public function settings_exporter() {
             $exporter = EDD_CSV_SETTINGS_EXPORTER();
         }
 
@@ -141,10 +143,20 @@ if( !class_exists( 'EDD_CSV_Manager' ) ) {
          * @access      private
          * @return      void
          */
-        public function importer() {
+        public function settings_importer() {
             $importer = EDD_CSV_SETTINGS_IMPORTER();
         }
 
+        /**
+         * Setup the payment history importer
+         *
+         * @since       1.1.0
+         * @access      private
+         * @return      void
+         */
+        public function payment_history_importer() {
+            $importer = EDD_CSV_PAYMENT_HISTORY_IMPORTER();
+        }
     }
 }
 
