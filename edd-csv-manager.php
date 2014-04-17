@@ -84,8 +84,8 @@ if( !class_exists( 'EDD_CSV_Manager' ) ) {
          */
         private function includes() {
             require_once EDD_CSV_MANAGER_DIR . 'includes/functions.php';
-            require_once EDD_CSV_MANAGER_DIR . 'includes/class.exporter.php';
-            require_once EDD_CSV_MANAGER_DIR . 'includes/class.importer.php';
+            require_once EDD_CSV_MANAGER_DIR . 'includes/class.settings-exporter.php';
+            require_once EDD_CSV_MANAGER_DIR . 'includes/class.settings-importer.php';
         }
 
 
@@ -123,26 +123,26 @@ if( !class_exists( 'EDD_CSV_Manager' ) ) {
 
 
         /**
-         * Setup the exporter
+         * Setup the settings exporter
          *
          * @since       1.0.0
          * @access      private
          * @return      void
          */
         public function exporter() {
-            $exporter = EDD_CSVE();
+            $exporter = EDD_CSV_SETTINGS_EXPORTER();
         }
 
 
         /**
-         * Setup the importer
+         * Setup the settings importer
          *
          * @since       1.0.0
          * @access      private
          * @return      void
          */
         public function importer() {
-            $importer = EDD_CSVI();
+            $importer = EDD_CSV_SETTINGS_IMPORTER();
         }
 
     }

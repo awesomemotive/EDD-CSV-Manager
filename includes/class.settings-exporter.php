@@ -3,8 +3,7 @@
  * CSV Product Exporter
  *
  * @since       1.0.0
- * @package     EDD CSV Manager
- * @subpackage  Exporter
+ * @package     CSVManager\SettingsExporter
  * @copyright   Copyright (c) 2013, Daniel J Griffiths
  */
 
@@ -13,9 +12,9 @@
 if( !defined( 'ABSPATH' ) ) exit;
 
 
-if( !class_exists( 'EDD_CSV_Exporter' ) ) {
+if( !class_exists( 'EDD_CSV_Settings_Exporter' ) ) {
 
-    class EDD_CSV_Exporter {
+    class EDD_CSV_Settings_Exporter {
 
         private static $instance;
 
@@ -31,7 +30,7 @@ if( !class_exists( 'EDD_CSV_Exporter' ) ) {
          */
         public static function instance() {
             if( !self::$instance ) {
-                self::$instance = new EDD_CSV_Exporter();
+                self::$instance = new EDD_CSV_Settings_Exporter();
                 self::$instance->init();
             }
 
@@ -316,6 +315,6 @@ if( !class_exists( 'EDD_CSV_Exporter' ) ) {
 }
 
 
-function EDD_CSVE() {
-    return EDD_CSV_Exporter::instance();
+function EDD_CSV_SETTINGS_EXPORTER() {
+    return EDD_CSV_Settings_Exporter::instance();
 }

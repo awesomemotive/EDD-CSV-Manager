@@ -3,8 +3,7 @@
  * CSV Product Importer
  *
  * @since       1.0.0
- * @package     EDD CSV Manager
- * @subpackage  Importer
+ * @package     CSVManager\SettingsImporter
  * @copyright   Copyright (c) 2013, Daniel J Griffiths
  */
 
@@ -13,9 +12,9 @@
 if( !defined( 'ABSPATH' ) ) exit;
 
 
-if( !class_exists( 'EDD_CSV_Importer' ) ) {
+if( !class_exists( 'EDD_CSV_Settings_Importer' ) ) {
 
-    class EDD_CSV_Importer {
+    class EDD_CSV_Settings_Importer {
 
         private static $instance;
 
@@ -31,7 +30,7 @@ if( !class_exists( 'EDD_CSV_Importer' ) ) {
          */
         public static function instance() {
             if( !self::$instance ) {
-                self::$instance = new EDD_CSV_Importer();
+                self::$instance = new EDD_CSV_Settings_Importer();
                 self::$instance->includes();
                 self::$instance->init();
             }
@@ -683,6 +682,6 @@ if( !class_exists( 'EDD_CSV_Importer' ) ) {
 }
 
 
-function EDD_CSVI() {
-    return EDD_CSV_Importer::instance();
+function EDD_CSV_SETTINGS_IMPORTER() {
+    return EDD_CSV_Settings_Importer::instance();
 }
