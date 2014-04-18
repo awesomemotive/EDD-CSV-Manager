@@ -89,8 +89,6 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
          */
         public function add_metabox() {
 
-            $wp_upload_dir = wp_upload_dir();
-
             ob_start();
 
             echo '<div class="postbox">';
