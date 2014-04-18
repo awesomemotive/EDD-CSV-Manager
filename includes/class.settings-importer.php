@@ -274,7 +274,7 @@ if( !class_exists( 'EDD_CSV_Settings_Importer' ) ) {
             }
             set_transient( 'edd_csv_file', basename( $import_file ) );
 
-            wp_redirect( add_query_arg( 'tab' => 'import_export', 'step', '2', $this->page ) ); exit;
+            wp_redirect( add_query_arg( array( 'tab' => 'import_export', 'step' => '2' ), $this->page ) ); exit;
         }
 
 
