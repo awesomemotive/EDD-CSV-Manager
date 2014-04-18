@@ -250,7 +250,7 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
 
             // Make sure we have a valid CSV
             if( empty( $import_file ) || !$this->is_valid_csv( $_FILES['import_file']['name'] ) ) {
-                wp_redirect( add_query_arg( array( 'step' => '1', 'errno' => '2' ), $this->page ) );
+                wp_redirect( add_query_arg( array( 'tab' => 'import_export', 'step' => '1', 'errno' => '2' ), $this->page ) );
                 exit;
             }
 
@@ -267,7 +267,7 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
             }
             set_transient( 'edd_csv_file', basename( $import_file ) );
 
-            wp_redirect( add_query_arg( 'step', '2', $this->page ) ); exit;
+            wp_redirect( add_query_arg( 'tab' => 'import_export', 'step', '2', $this->page ) ); exit;
         }
 
 
@@ -312,7 +312,7 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
             $fields = array_flip( $_POST['csv_fields'] );
 
             if( $this->map_has_duplicates( $_POST['csv_fields'] ) ) {
-                wp_redirect( add_query_arg( array( 'step' => '2', 'errno' => '1' ), $this->page ) );
+                wp_redirect( add_query_arg( array( 'tab' => 'import_export', 'step' => '2', 'errno' => '1' ), $this->page ) );
                 exit;
             }
 
@@ -496,11 +496,11 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
                 $download_errors = serialize( $download_errors );
                 set_transient( 'edd_download_errors', $download_errors );
 
-                wp_redirect( add_query_arg( array( 'step' => '1', 'errno' => '7' ), $this->page ) );
+                wp_redirect( add_query_arg( array( 'tab' => 'import_export', 'step' => '1', 'errno' => '7' ), $this->page ) );
                 exit;
             }
 
-            wp_redirect( add_query_arg( array( 'step' => '1', 'errno' => '0' ), $this->page ) );
+            wp_redirect( add_query_arg( array( 'tab' => 'import_export', 'step' => '1', 'errno' => '0' ), $this->page ) );
             exit;
         }
     }
