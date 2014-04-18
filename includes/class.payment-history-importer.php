@@ -182,25 +182,18 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
          */
         public function get_fields( $parent ) {
             $fields = array(
-                'post_author'               => __( 'Author ID', 'edd-csv-manager' ),
-                '_edd_button_behavior'      => __( 'Button Behavior', 'edd-csv-manager' ),
-                'categories'                => __( 'Categories', 'edd-csv-manager' ),
-                'post_date'                 => __( 'Date Created', 'edd-csv-manager' ),
-                'post_content'              => __( 'Description', 'edd-csv-manager' ),
-                '_edd_files'                => __( 'Download Files', 'edd-csv-manager' ),
-                '_edd_download_limit'       => __( 'Download Limit', 'edd-csv-manager' ),
-                'post_excerpt'              => __( 'Excerpt', 'edd-csv-manager' ),
-                '_edd_hide_purchase_link'   => __( 'Hide Purchase Link', 'edd-csv-manager' ),
-                '_edd_images'               => __( 'Image Files', 'edd-csv-manager' ),
-                'post_name'                 => __( 'Post Name', 'edd-csv-manager' ),
-                '_edd_price'                => __( 'Price', 'edd-csv-manager' ),
-                'post_title'                => __( 'Product Name', 'edd-csv-manager' ),
-                'post_status'               => __( 'Status', 'edd-csv-manager' ),
-				'tags'                      => __( 'Tags', 'edd-csv-manager' ),
-				'edd_sku'                   => __( 'SKU', 'edd-csv-manager' )
+                'price'                     => __( 'Price', 'edd-csv-manager' ),
+                'post_date'                 => __( 'Date Purchased', 'edd-csv-manager' ),
+                'user_email'                => __( 'User Email', 'edd-csv-manager' ),
+                'currency'                  => __( 'Currency', 'edd-csv-manager' ),
+                'downloads'                 => __( 'Downloads', 'edd-csv-manager' ),
+                'cart_details'              => __( 'Cart Details', 'edd-csv-manager' ),
+                'first_name'                => __( 'First Name', 'edd-csv-manager' ),
+                'last_name'                 => __( 'Last Name', 'edd-csv-manager' ),
+                'discount'                  => __( 'Discount', 'edd-csv-manager' ),
             );
 
-            $fields = apply_filters( 'edd_csv_fields', $fields );
+            $fields = apply_filters( 'edd_payment_history_csv_fields', $fields );
             asort( $fields );
 
             $return = '<option value="">' . __( 'Unmapped', 'edd-csv-manager' ) . '</option>';
@@ -361,28 +354,28 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
          * @return      void
          */
         private function process_import() {
-
             $defaults = array(
-                'post_name'                 => '',
+                'price'                     => '',
                 'post_date'                 => '',
-                'post_author'               => '',
-                'post_title'                => '',
-                'post_content'              => '',
-                'post_excerpt'              => '',
-                'post_status'               => 'draft',
-                'post_type'                 => 'download',
-                'categories'                => '',
-                'tags'                      => '',
-                '_edd_price'                => '',
-                '_edd_files'                => '',
-                '_edd_download_limit'       => '',
-                '_edd_button_behavior'      => '',
-                '_edd_hide_purchase_link'   => '',
-				'_edd_images'               => '',
-				'edd_sku'                   => ''
+                'user_email'                => '',
+                'purchase_key'              => strtolower( md5( uniqid() ) ),
+                'currency'                  => 'USD',
+                'downloads'                 => '',
+                'cart_details'              => '',
+                'user_info'                 => array(
+                    'id'                    => '',
+                    'email'                 => '',
+                    'first_name'            => '',
+                    'last_name'             => '',
+                    'discount'              => ''
+                ),
+                'user_id'                   => '',
+                'status'                    => 'pending',
+                'post_data'                 => array(),
+                'gateway'                   => 'csv_import',
             );
 
-            $defaults = apply_filters( 'edd_csv_default_fields', $defaults );
+            $defaults = apply_filters( 'edd_payment_history_csv_default_fields', $defaults );
 
             $csv_fields = maybe_unserialize( get_transient( 'csv_fields' ) );
             $csv_fields = wp_parse_args( $csv_fields, $defaults );
@@ -397,29 +390,15 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
             $csv->auto( $import_file );
 
             // Map headers to post fields
-            $post_name_key      = array_search( $csv_fields['post_name'], $headers );
-            $post_author_key    = array_search( $csv_fields['post_author'], $headers );
-            $post_title_key     = array_search( $csv_fields['post_title'], $headers );
-            $post_content_key   = array_search( $csv_fields['post_content'], $headers );
-            $post_excerpt_key   = array_search( $csv_fields['post_excerpt'], $headers );
-            $post_status_key    = array_search( $csv_fields['post_status'], $headers );
+            $price_key          = array_search( $csv_fields['price'], $headers );
             $post_date_key      = array_search( $csv_fields['post_date'], $headers );
-
-            // Meta fields
-            $price_key          = array_search( $csv_fields['_edd_price'], $headers );
-            $dl_limit_key       = array_search( $csv_fields['_edd_download_limit'], $headers );
-            $button_behavior    = array_search( $csv_fields['_edd_button_behavior'], $headers );
-            $hide_link          = array_search( $csv_fields['_edd_hide_purchase_link'], $headers );
-			$edd_sku            = array_search( $csv_fields['edd_sku'], $headers );
-
-            // Categories
-            $categories_key     = array_search( $csv_fields['categories'], $headers );
-
-            // Tags
-            $tags_key           = array_search( $csv_fields['tags'], $headers );
-
-            // Files
-            $files_key          = array_search( $csv_fields['_edd_files'], $headers);
+            $user_email_key     = array_search( $csv_fields['user_email'], $headers );
+            $currency_key       = array_search( $csv_fields['currency'], $headers );
+            $downloads_key      = array_search( $csv_fields['downloads'], $headers );
+            $cart_details_key   = array_search( $csv_fields['cart_details'], $headers );
+            $first_name_key     = array_search( $csv_fields['first_name'], $headers );
+            $last_name_key      = array_search( $csv_fields['last_name'], $headers );
+            $discount_key       = array_search( $csv_fields['discount'], $headers );
 
             foreach( $csv->data as $key => $row ) {
                 $new_row = array();
@@ -429,253 +408,95 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
                     $i++;
                 }
 
-                // Get the column keys
-                $post_data = array(
-                    'post_name'     => $new_row[ $post_name_key ],
-                    'post_author'   => $new_row[ $post_author_key ],
-                    'post_title'    => $new_row[ $post_title_key ],
-                    'post_content'  => $new_row[ $post_content_key ],
-                    'post_excerpt'  => $new_row[ $post_excerpt_key ],
-                    'post_status'   => $new_row[ $post_status_key ],
-                    'post_date'     => date( 'Y-m-d H:i:s', strtotime( $new_row[ $post_date_key ] ) ),
-                    'post_type'     => 'download'
-                );
+                // Get user info or create new user
+                $user = get_user_by( 'email', $new_row[ $user_email_key ] );
 
-                $file_errors = array();
+                if( !$user ) {
+                    $password = wp_generate_password();
+                    $user = wp_insert_user(
+                        array(
+                            'user_email'    => sanitize_email( $new_row[ $user_email_key ] ),
+                            'user_login'    => sanitize_email( $new_row[ $user_email_key ] ),
+                            'user_pass'     => $password,
+                            'first_name'    => sanitize_text_field( $new_row[ $first_name_key ] ),
+                            'last_name'     => sanitize_text_field( $new_row[ $last_name_key ] )
+                        )
+                    );
 
-                // Set files
-                if( $files_key && !empty( $new_row[ $files_key ] ) ) {
-
-                    $files = array_map( 'trim', explode( '|', $new_row[ $files_key ] ) );
-                    $final_files = array();
-                    $file_path = '';
-
-                    // Make sure files exist
-                    foreach( $files as $file ) {
-                        $file_details = parse_url( $file );
-
-                        if(
-                            (
-                                ! $file_details ||
-                                ! isset( $file_details['scheme'] ) ||
-                                (
-                                    'http' != $file_details['scheme'] &&
-                                    'https' != $file_details['scheme'] &&
-                                    strpos( $file, site_url() ) !== false
-                                )
-                            ) && ! isset( $_POST['edd_import_s3'] )
-                        ) {
-                            // Set preferred path for file hosting
-                            $search_base_path = trailingslashit( WP_CONTENT_DIR );
-                            $preferred_path = $search_base_path . 'uploads/edd/' . $file;
-
-                            if( file_exists( $preferred_path ) ) {
-                                // Check /wp-content/uploads/edd/$file
-                                $file_path = $preferred_path;
-                            } elseif( file_exists( $search_base_path . $file ) ) {
-                                // Check /wp-content/$file
-                                if( rename( $search_base_path . $file, $preferred_path ) ) {
-                                    $file_path = $preferred_path;
-                                } else {
-                                    $file_path = $search_base_path . $file;
-                                }
-                            } elseif( file_exists( $search_base_path . 'uploads/' . $file ) ) {
-                                // Check /wp-content/uploads/$file
-                                if( rename( $search_base_path . 'uploads/' . $file, $preferred_path ) ) {
-                                    $file_path = $preferred_path;
-                                } else {
-                                    $file_path = $search_base_path . 'uploads/' . $file;
-                                }
-                            } else {
-                                // Error
-                                $file_errors[] = array(
-                                    'row'   => $i + 1,
-                                    'file'  => $file
-                                );
-                            }
-
-                        } else {
-                             $file_path = $file;
-                        }
-
-                        // Store file in array for later use
-                        $final_files[] = array(
-                            'name'  => basename( $file_path ),
-                            'file'  => str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $file_path )
-                        );
-                    }
+                    $user_id = $user->ID;
+                    $email   = $user->user_email;
+                } else {
+                    $user_id = $user->ID;
+                    $email   = $user->user_email;
                 }
 
+                $download_errors = array();
 
-                // Handle file errors
-                if( !empty( $file_errors ) ) {
-                    $i++;
-                    continue;
-                }
+                // Setup downloads
+                if( $downloads_key && !empty( $new_row[ $downloads_key ] ) ) {
 
+                    $downloads       = array_map( 'trim', explode( '|', $new_row[ $downloads_key ] ) );
+                    $final_downloads = array();
+                    $products        = array();
+                    $cart_details    = array();
 
-                // Setup featured image
-                $image_key      = array_search( $csv_fields['_edd_images'], $headers );
-                $image          = false;
-                $final_images   = array();
+                    // Make sure downloads exist
+                    foreach( $downloads as $download_name ) {
+                        $download = get_page_by_title( $download_name, OBJECT, 'download' );
 
-                if( $image_key && !empty( $new_row[ $image_key ] ) ) {
-
-                    require_once ABSPATH . 'wp-admin/includes/image.php';
-                    require_once ABSPATH . 'wp-admin/includes/file.php';
-                    require_once ABSPATH . 'wp-admin/includes/media.php';
-
-                    $image          = true;
-                    $image_file     = $new_row[ $image_key ];
-                    $image_details  = parse_url( $image_file );
-
-                    if( !$image_details || !isset( $image_details['scheme'] ) || ( 'http' != $image_details['scheme'] && 'https' != $image_details['scheme'] && strpos( $image_file, site_url() ) !== false ) ) {
-                        // Set preferred path for file hosting
-                        $search_base_path = trailingslashit( WP_CONTENT_DIR );
-                        $preferred_path = $search_base_path . 'uploads/edd/' . $image_file;
-
-                        if( file_exists( $preferred_path ) ) {
-                            // Check /wp-content/uploads/edd/$file
-                            $file_path = $preferred_path;
-                        } elseif( file_exists( $search_base_path . $image_file ) ) {
-                            // Check /wp-content/$file
-                            if( rename( $search_base_path . $image_file, $preferred_path ) ) {
-                                $file_path = $preferred_path;
-                            } else {
-                                $file_path = $search_base_path . $image_file;
-                            }
-                        } elseif( file_exists( $search_base_path . 'uploads/' . $image_file ) ) {
-                            // Check /wp-content/uploads/$file
-                            if( rename( $search_base_path . 'uploads/' . $image_file, $preferred_path ) ) {
-                                $file_path = $preferred_path;
-                            } else {
-                                $file_path = $search_base_path . 'uploads/' . $image_file;
-                            }
+                        if( $download ) {
+                            $products[] = array(
+                                'id'      => $download->ID,
+                                'options' => array()
+                            );
+                        
+                            $cart_details[] = array(
+                                'id'    => $download->ID,
+                                'price' => ''
+                            );
                         } else {
                             // Error
-                            $image = false;
-                            $file_errors[] = array(
-                                'row'   => $i + 1,
-                                'file'  => $image_key
+                            $download_errors[] = array(
+                                'row'      => $i + 1,
+                                'product'  => $download_name
                             );
                         }
-                    } else {
-                        $file_path = $image_file;
                     }
 
-                    // Store image in array for later use
-                    $final_images[] = array(
-                        'name'  => basename( $file_path ),
-                        'path'  => $file_path,
-                        'url'   => str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $file_path )
+                    $payment_data = array(
+                        'price'         => $new_row[ $price_key ],
+                        'post_date'     => date( 'Y-m-d H:i:s', strtotime( $new_row[ $post_date_key ] ) ),
+                        'user_email'    => $new_row[ $new_row[ $user_email_key ] ],
+                        'purchase_key'  => strtolower( md5( uniqid() ) ), // random key
+                        'currency'      => 'USD',
+                        'downloads'     => $products,
+                        'cart_details'  => $cart_details,
+                        'user_info'     => array(
+                            'id'            => $user_id,
+                            'email'         => $email,
+                            'first_name'    => $new_row[ $first_name_key ],
+                            'last_name'     => $new_row[ $last_name_key ],
+                            'discount'      => $new_row[ $discount_key ]
+                        ),
+                        'user_id'       => $user_id,
+                        'status'        => 'pending',
+                        'post_data'     => array(),
+                        'gateway'       => 'csv_import'
                     );
-                }
 
-
-                $post_id = wp_insert_post( $post_data );
-
-                // Verify post created successfully
-                if( $post_id ) {
-
-                    // Set meta fields
-                    if( $price_key && !empty( $new_row[ $price_key ] ) )
-                        update_post_meta( $post_id, 'edd_price', $new_row[ $price_key ] );
-
-                    if( $dl_limit_key && !empty( $new_row[ $dl_limit_key ] ) )
-                        update_post_meta( $post_id, '_edd_download_limit', $new_row[ $dl_limit_key ] );
-
-                    if( $button_behavior && !empty( $new_row[ $button_behavior ] ) )
-                        update_post_meta( $post_id, '_edd_button_behavior', $new_row[ $button_behavior] );
-
-                    if( $hide_link && !empty( $new_row[ $hide_link ] ) )
-                        update_post_meta( $post_id, '_edd_hide_purchase_link', $new_row[ $hide_link ] );
-
-					if( $edd_sku && !empty( $new_row[ $edd_sku ] ) )
-						update_post_meta( $post_id, 'edd_sku', $new_row[ $edd_sku ] );
-
-                    if( !empty( $final_files ) )
-                        update_post_meta( $post_id, 'edd_download_files', $final_files );
-
-
-                    // Attach image
-                    if( $image ) {
-                        $filetype = wp_check_filetype( $final_images[0]['name'], null );
-
-                        $attachment = array(
-                            'guid'              => $final_images[0]['url'],
-                            'post_mime_type'    => $filetype['type'],
-                            'post_title'        => preg_replace( '/\.[^.]+$/', '', $final_images[0]['name'] ),
-                            'post_content'      => '',
-                            'post_status'       => 'inherit',
-                            'post_parent'       => $post_id
-                        );
-
-                        $upload_dir = wp_upload_dir();
-
-                        if( stristr( $final_images[0]['path'], $upload_dir['basedir'] ) ) {
-                            $attachment_url = str_replace( $upload_dir['basedir'], '', $final_images[0]['path'] );
-
-                            $attachment_id = wp_insert_attachment( $attachment, $attachment_url, $post_id );
-
-                            if( !is_wp_error( $attachment_id ) && $attachment_id ) {
-                                update_post_meta( $post_id, '_thumbnail_id', $attachment_id );
-
-                                $attachment_data = wp_generate_attachment_metadata( $attachment_id, $final_images[0]['path'] );
-                                wp_update_attachment_metadata( $attachment_id, $attachment_data );
-                            } else {
-                                $image_errors = serialize( $final_images[0]['path'] );
-                                set_transient( 'edd_image_errors', $image_errors );
-
-                                wp_redirect( add_query_arg( array( 'step' => '1', 'errno' => '4' ), $this->page ) );
-                                exit;
-                            }
-                        } else {
-                            $image_errors = serialize( $final_images[0]['path'] );
-                            set_transient( 'edd_image_perms_errors', $image_errors );
-
-                            wp_redirect( add_query_arg( array( 'step' => '1', 'errno' => '5' ), $this->page ) );
-                            exit;
-                        }
-                    }
-
-
-                    // Set tags
-                    if( $tags_key && !empty( $new_row[ $tags_key ] ) ) {
-
-                        $tags = array_map( 'trim', explode( '|', $new_row[ $tags_key ] ) );
-
-                        // Create tags if they don't exist
-                        foreach( $tags as $tag ) {
-                            if( !term_exists( $tag, 'download_tag' ) )
-                                wp_insert_term( $tag, 'download_tag' );
-                        }
-
-                        wp_set_object_terms( $post_id, $tags, 'download_tag' );
-                    }
-
-
-                    // Set categories
-                    if( $categories_key && !empty( $new_row[ $categories_key ] ) ) {
-
-                        $categories = array_map( 'trim', explode( '|', $new_row[ $categories_key ] ) );
-
-                        // Create categories if they don't exist
-                        foreach( $categories as $category ) {
-                            if( !term_exists( $category, 'download_category' ) )
-                                wp_insert_term( $category, 'download_category' );
-                        }
-
-                        wp_set_object_terms( $post_id, $categories, 'download_category' );
-                    }
+                    $payment_id = edd_insert_payment( $payment_data );
+                    remove_action( 'edd_update_payment_status', 'edd_trigger_purchase_receipt', 10 );
+                    remove_action( 'edd_complete_purchase', 'edd_trigger_purchase_receipt', 999 );
+                    edd_update_payment_status( $payment_id, 'publish' );
                 }
             }
 
 
-            if( !empty( $file_errors ) ) {
-                $file_errors = serialize( $file_errors );
-                set_transient( 'edd_file_errors', $file_errors );
+            if( !empty( $download_errors ) ) {
+                $download_errors = serialize( $download_errors );
+                set_transient( 'edd_download_errors', $download_errors );
 
-                wp_redirect( add_query_arg( array( 'step' => '1', 'errno' => '3' ), $this->page ) );
+                wp_redirect( add_query_arg( array( 'step' => '1', 'errno' => '7' ), $this->page ) );
                 exit;
             }
 
