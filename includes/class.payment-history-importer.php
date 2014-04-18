@@ -184,8 +184,7 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
                 'post_date'                 => __( 'Date Purchased', 'edd-csv-manager' ),
                 'user_email'                => __( 'User Email', 'edd-csv-manager' ),
                 'currency'                  => __( 'Currency', 'edd-csv-manager' ),
-                'downloads'                 => __( 'Downloads', 'edd-csv-manager' ),
-                'cart_details'              => __( 'Cart Details', 'edd-csv-manager' ),
+                'downloads'                 => __( 'Downloads', 'edd-csv-manager' ),                
                 'first_name'                => __( 'First Name', 'edd-csv-manager' ),
                 'last_name'                 => __( 'Last Name', 'edd-csv-manager' ),
                 'discount'                  => __( 'Discount', 'edd-csv-manager' ),
@@ -393,7 +392,6 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
             $user_email_key     = array_search( $csv_fields['user_email'], $headers );
             $currency_key       = array_search( $csv_fields['currency'], $headers );
             $downloads_key      = array_search( $csv_fields['downloads'], $headers );
-            $cart_details_key   = array_search( $csv_fields['cart_details'], $headers );
             $first_name_key     = array_search( $csv_fields['first_name'], $headers );
             $last_name_key      = array_search( $csv_fields['last_name'], $headers );
             $discount_key       = array_search( $csv_fields['discount'], $headers );
