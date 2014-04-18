@@ -99,7 +99,7 @@ if( !class_exists( 'EDD_CSV_Settings_Importer' ) ) {
             echo '<p>' . __( 'Import products to your Easy Digital Downloads site from a .csv file.', 'edd-csv-manager' ) . '</p>';
             echo '<form method="post" enctype="multipart/form-data" action="' . admin_url( $this->page ) . '">';
 
-            if( isset( $_GET['errno'] ) )
+            if( isset( $_GET['errno'] ) && isset( $_GET['type'] ) && $_GET['type'] == 'settings' )
                 edd_csv_error_handler( $_GET['errno'] );
 
             if( empty( $_GET['step'] ) || $_GET['step'] == 1 ) {
@@ -113,7 +113,7 @@ if( !class_exists( 'EDD_CSV_Settings_Importer' ) ) {
                 wp_nonce_field( 'edd_import_nonce', 'edd_import_nonce' );
                 submit_button( __( 'Next', 'edd-csv-manager' ), 'secondary', 'submit', false );
                 echo '</p>';
-            } elseif( $_GET['step'] == 2 ) {
+            } elseif( $_GET['step'] == 2 && isset( $_GET['type'] ) && $_GET['type'] == 'settings' ) {
                 $fields = get_transient( 'edd_csv_headers' );
 
                 // Display CSV fields for mapping
@@ -257,7 +257,7 @@ if( !class_exists( 'EDD_CSV_Settings_Importer' ) ) {
 
             // Make sure we have a valid CSV
             if( empty( $import_file ) || !$this->is_valid_csv( $_FILES['import_file']['name'] ) ) {
-                wp_redirect( add_query_arg( array( 'tab' => 'import_export', 'step' => '1', 'errno' => '2' ), $this->page ) );
+                wp_redirect( add_query_arg( array( 'tab' => 'import_export', 'type' => 'settings', 'step' => '1', 'errno' => '2' ), $this->page ) );
                 exit;
             }
 
@@ -274,7 +274,7 @@ if( !class_exists( 'EDD_CSV_Settings_Importer' ) ) {
             }
             set_transient( 'edd_csv_file', basename( $import_file ) );
 
-            wp_redirect( add_query_arg( array( 'tab' => 'import_export', 'step' => '2' ), $this->page ) ); exit;
+            wp_redirect( add_query_arg( array( 'tab' => 'import_export', 'type' => 'settings', 'step' => '2' ), $this->page ) ); exit;
         }
 
 
@@ -319,7 +319,7 @@ if( !class_exists( 'EDD_CSV_Settings_Importer' ) ) {
             $fields = array_flip( $_POST['csv_fields'] );
 
             if( $this->map_has_duplicates( $_POST['csv_fields'] ) ) {
-                wp_redirect( add_query_arg( array( 'tab' => 'import_export', 'step' => '2', 'errno' => '1' ), $this->page ) );
+                wp_redirect( add_query_arg( array( 'tab' => 'import_export', 'type' => 'settings', 'step' => '2', 'errno' => '1' ), $this->page ) );
                 exit;
             }
 
@@ -626,14 +626,14 @@ if( !class_exists( 'EDD_CSV_Settings_Importer' ) ) {
                                 $image_errors = serialize( $final_images[0]['path'] );
                                 set_transient( 'edd_image_errors', $image_errors );
 
-                                wp_redirect( add_query_arg( array( 'tab' => 'import_export', 'step' => '1', 'errno' => '4' ), $this->page ) );
+                                wp_redirect( add_query_arg( array( 'tab' => 'import_export', 'type' => 'settings', 'step' => '1', 'errno' => '4' ), $this->page ) );
                                 exit;
                             }
                         } else {
                             $image_errors = serialize( $final_images[0]['path'] );
                             set_transient( 'edd_image_perms_errors', $image_errors );
 
-                            wp_redirect( add_query_arg( array( 'tab' => 'import_export', 'step' => '1', 'errno' => '5' ), $this->page ) );
+                            wp_redirect( add_query_arg( array( 'tab' => 'import_export', 'type' => 'settings', 'step' => '1', 'errno' => '5' ), $this->page ) );
                             exit;
                         }
                     }
@@ -675,11 +675,11 @@ if( !class_exists( 'EDD_CSV_Settings_Importer' ) ) {
                 $file_errors = serialize( $file_errors );
                 set_transient( 'edd_file_errors', $file_errors );
 
-                wp_redirect( add_query_arg( array( 'tab' => 'import_export', 'step' => '1', 'errno' => '3' ), $this->page ) );
+                wp_redirect( add_query_arg( array( 'tab' => 'import_export', 'type' => 'settings', 'step' => '1', 'errno' => '3' ), $this->page ) );
                 exit;
             }
 
-            wp_redirect( add_query_arg( array( 'tab' => 'import_export', 'step' => '1', 'errno' => '0' ), $this->page ) );
+            wp_redirect( add_query_arg( array( 'tab' => 'import_export', 'type' => 'settings', 'step' => '1', 'errno' => '0' ), $this->page ) );
             exit;
         }
     }
