@@ -102,7 +102,7 @@ if( !class_exists( 'EDD_CSV_Settings_Importer' ) ) {
             if( isset( $_GET['errno'] ) && isset( $_GET['type'] ) && $_GET['type'] == 'settings' )
                 edd_csv_error_handler( $_GET['errno'] );
 
-            if( empty( $_GET['step'] ) || $_GET['step'] == 1 ) {
+            if( empty( $_GET['step'] ) || $_GET['step'] == 1 || ( isset( $_GET['type'] ) && $_GET['type'] != 'settings' ) ) {
                 // Cleanup data to provent accidental carryover
                 $this->cleanup();
 
