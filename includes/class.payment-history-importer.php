@@ -186,10 +186,11 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
                 'post_date'                 => __( 'Date Purchased', 'edd-csv-manager' ),
                 'user_email'                => __( 'User Email', 'edd-csv-manager' ),
                 'currency'                  => __( 'Currency', 'edd-csv-manager' ),
-                'downloads'                 => __( 'Downloads', 'edd-csv-manager' ),                
+                'downloads'                 => __( 'Downloads', 'edd-csv-manager' ),
                 'first_name'                => __( 'First Name', 'edd-csv-manager' ),
                 'last_name'                 => __( 'Last Name', 'edd-csv-manager' ),
                 'discount'                  => __( 'Discount', 'edd-csv-manager' ),
+                'tax'                       => __( 'Tax', 'edd-csv-manager' )
             );
 
             $fields = apply_filters( 'edd_payment_history_csv_fields', $fields );
@@ -372,6 +373,7 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
                 'status'                    => 'pending',
                 'post_data'                 => array(),
                 'gateway'                   => 'csv_import',
+                'tax'                       => ''
             );
 
             $defaults = apply_filters( 'edd_payment_history_csv_default_fields', $defaults );
@@ -394,6 +396,7 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
             $user_email_key     = array_search( $csv_fields['user_email'], $headers );
             $currency_key       = array_search( $csv_fields['currency'], $headers );
             $downloads_key      = array_search( $csv_fields['downloads'], $headers );
+            $tax_key            = array_search( $csv_fields['tax'], $headers );
             $first_name_key     = array_search( $csv_fields['first_name'], $headers );
             $last_name_key      = array_search( $csv_fields['last_name'], $headers );
             $discount_key       = array_search( $csv_fields['discount'], $headers );
@@ -450,8 +453,10 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
                             );
                         
                             $cart_details[] = array(
-                                'id'    => $download->ID,
-                                'price' => ''
+                                'id'       => $download->ID,
+                                'price'    => '',
+                                'tax'      => 0,
+                                'quantity' => 1
                             );
                         } else {
                             // Error
@@ -480,7 +485,8 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
                         'user_id'       => $user_id,
                         'status'        => 'pending',
                         'post_data'     => array(),
-                        'gateway'       => 'csv_import'
+                        'gateway'       => 'csv_import',
+                        'tax'           => $new_row[ $tax_key ]
                     );
 
                     $payment_id = edd_insert_payment( $payment_data );
