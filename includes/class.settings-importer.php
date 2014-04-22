@@ -103,8 +103,10 @@ if( !class_exists( 'EDD_CSV_Settings_Importer' ) ) {
                 edd_csv_error_handler( $_GET['errno'] );
 
             if( empty( $_GET['step'] ) || $_GET['step'] == 1 || ( isset( $_GET['type'] ) && $_GET['type'] != 'settings' ) ) {
-                // Cleanup data to provent accidental carryover
-                $this->cleanup();
+                if( empty( $_GET['step'] ) || $_GET['step'] == 1 ) {
+                    // Cleanup data to provent accidental carryover
+                    $this->cleanup();
+                }
 
                 echo '<p><input type="file" name="import_file" /></p>';
                 echo '<p><label for="has_headers"><input type="checkbox" id="has_headers" name="has_headers" checked="yes" /> ' . __( 'Does the CSV include a header row?', 'edd-csv-manager' ) . '</label></p>';

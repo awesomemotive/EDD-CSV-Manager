@@ -61,10 +61,10 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
             }
 
             // Handle uploading of a CSV
-            add_action( 'edd_upload_csv', array( $this, 'upload' ) );
+            add_action( 'edd_upload_purchase_csv', array( $this, 'upload' ) );
 
             // Handle mapping CSV fields to EDD fields
-            add_action( 'edd_map_csv', array( $this, 'map' ) );
+            add_action( 'edd_map_purchase_csv', array( $this, 'map' ) );
         }
 
 
@@ -101,13 +101,15 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
                 edd_csv_error_handler( $_GET['errno'] );
 
             if( empty( $_GET['step'] ) || $_GET['step'] == 1 || ( isset( $_GET['type'] ) && $_GET['type'] != 'purchase' ) ) {
-                // Cleanup data to provent accidental carryover
-                $this->cleanup();
+                if( empty( $_GET['step'] ) || $_GET['step'] == 1 ) {
+                    // Cleanup data to provent accidental carryover
+                    $this->cleanup();
+                }
 
                 echo '<p><input type="file" name="import_file" /></p>';
                 echo '<p><label for="has_headers"><input type="checkbox" id="has_headers" name="has_headers" checked="yes" /> ' . __( 'Does the CSV include a header row?', 'edd-csv-manager' ) . '</label></p>';
                 echo '<p>';
-                echo '<input type="hidden" name="edd_action" value="upload_csv" />';
+                echo '<input type="hidden" name="edd_action" value="upload_purchase_csv" />';
                 wp_nonce_field( 'edd_import_nonce', 'edd_import_nonce' );
                 submit_button( __( 'Next', 'edd-csv-manager' ), 'secondary', 'submit', false );
                 echo '</p>';
@@ -141,7 +143,7 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
                     echo '</label></p>';
                 }
 
-                echo '<p><input type="hidden" name="edd_action" value="map_csv" />';
+                echo '<p><input type="hidden" name="edd_action" value="map_purchase_csv" />';
                 wp_nonce_field( 'edd_import_nonce', 'edd_import_nonce' );
                 submit_button( __( 'Import', 'edd-csv-manager' ), 'secondary', 'submit', false );
                 echo '</p>';
@@ -435,9 +437,10 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
                     $final_downloads = array();
                     $products        = array();
                     $cart_details    = array();
+                    $i               = 0;
 
                     // Make sure downloads exist
-                    foreach( $downloads as $download_name ) {
+                    foreach( $downloads as $i => $download_name ) {
                         $download = get_page_by_title( $download_name, OBJECT, 'download' );
 
                         if( $download ) {
@@ -453,7 +456,7 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
                         } else {
                             // Error
                             $download_errors[] = array(
-                                'row'      => $i + 1,
+                                'row'      => $i,
                                 'product'  => $download_name
                             );
                         }
@@ -462,7 +465,7 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
                     $payment_data = array(
                         'price'         => $new_row[ $price_key ],
                         'post_date'     => date( 'Y-m-d H:i:s', strtotime( $new_row[ $post_date_key ] ) ),
-                        'user_email'    => $new_row[ $new_row[ $user_email_key ] ],
+                        'user_email'    => $new_row[ $user_email_key ],
                         'purchase_key'  => strtolower( md5( uniqid() ) ), // random key
                         'currency'      => 'USD',
                         'downloads'     => $products,
@@ -492,7 +495,7 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
                 $download_errors = serialize( $download_errors );
                 set_transient( 'edd_download_errors', $download_errors );
 
-                wp_redirect( add_query_arg( array( 'tab' => 'import_export', 'type' => 'purchase', 'step' => '1', 'errno' => '7' ), $this->page ) );
+                wp_redirect( add_query_arg( array( 'tab' => 'import_export', 'type' => 'purchase', 'step' => '1', 'errno' => '6' ), $this->page ) );
                 exit;
             }
 
