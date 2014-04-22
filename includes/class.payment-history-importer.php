@@ -445,6 +445,13 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
                     // Make sure downloads exist
                     foreach( $downloads as $i => $download_name ) {
                         $download = get_page_by_title( $download_name, OBJECT, 'download' );
+                        
+                        if( !$download && is_numeric( $download_name ) ) {
+                            $download = get_post( $download_name, OBJECT );
+                            $post_type = get_post_type( $download );
+
+                            if( $post_type != 'download' ) unset( $download );
+                        }
 
                         if( $download ) {
                             $products[] = array(
