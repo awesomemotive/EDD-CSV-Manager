@@ -108,6 +108,7 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
 
                 echo '<p><input type="file" name="import_file" /></p>';
                 echo '<p><label for="has_headers"><input type="checkbox" id="has_headers" name="has_headers" checked="yes" /> ' . __( 'Does the CSV include a header row?', 'edd-csv-manager' ) . '</label></p>';
+                echo '<p><label for="resend_receipts"><input type="checkbox" id="resend_receipts" name="resend_receipts" checked="yes" /> ' . __( 'Should we resend purchase receipts?', 'edd-csv-manager' ) . '</label></p>';
                 echo '<p>';
                 echo '<input type="hidden" name="edd_action" value="upload_purchase_csv" />';
                 wp_nonce_field( 'edd_import_nonce', 'edd_import_nonce' );
@@ -169,6 +170,7 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
             if( get_transient( 'edd_csv_file' ) )       delete_transient( 'edd_csv_file' );
             if( get_transient( 'edd_csv_map' ) )        delete_transient( 'edd_csv_map' );
             if( get_transient( 'has_headers' ) )        delete_transient( 'has_headers' );
+            if( get_transient( 'resend_receipts' ) )    delete_transient( 'resend_receipts' );
         }
 
 
@@ -264,6 +266,9 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
             if( isset( $_POST['has_headers'] ) ) {
                 set_transient( 'has_headers', '1' );
                 set_transient( 'edd_csv_headers', $csv->titles );
+            }
+            if( isset( $_POST['resend_receipts'] ) ) {
+                set_transient( 'resend_receipts', '1' );
             }
             set_transient( 'edd_csv_file', basename( $import_file ) );
 
@@ -497,8 +502,10 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
                     );
 
                     $payment_id = edd_insert_payment( $payment_data );
-                    remove_action( 'edd_update_payment_status', 'edd_trigger_purchase_receipt', 10 );
-                    remove_action( 'edd_complete_purchase', 'edd_trigger_purchase_receipt', 999 );
+                    if( !get_transient( 'has_headers' ) ) {
+                        remove_action( 'edd_update_payment_status', 'edd_trigger_purchase_receipt', 10 );
+                        remove_action( 'edd_complete_purchase', 'edd_trigger_purchase_receipt', 999 );
+                    }
                     edd_update_payment_status( $payment_id, 'publish' );
                 }
             }
