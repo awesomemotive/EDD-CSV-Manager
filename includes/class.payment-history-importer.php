@@ -91,7 +91,7 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
 
             ob_start();
 
-            echo '<div class="postbox">';
+            echo '<div class="postbox" id="edd-payment-import">';
             echo '<h3><span>' . __( 'Import Purchase History from CSV', 'edd-csv-manager' ) . '</span></h3>';
             echo '<div class="inside">';
             echo '<p>' . __( 'Import previous purchase history from other ecommerce systems from a .csv file.', 'edd-csv-manager' ) . '</p>';
@@ -272,7 +272,7 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
             }
             set_transient( 'edd_csv_file', basename( $import_file ) );
 
-            wp_redirect( add_query_arg( array( 'tab' => 'import_export', 'type' => 'purchase', 'step' => '2' ), $this->page ) ); exit;
+            wp_redirect( add_query_arg( array( 'tab' => 'import_export', 'type' => 'purchase', 'step' => '2#edd-payment-import' ), $this->page ) ); exit;
         }
 
 
