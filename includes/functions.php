@@ -72,8 +72,18 @@ function edd_csv_error_handler( $errno ) {
             }
             delete_transient( 'edd_image_perms_errors' );
             break;
+        case '6':
+            $error = __( 'One or more purchases failed to import!', 'edd-csv-manager' );
+            $download_errors = get_transient( 'edd_download_errors' );
+            if( $download_errors ) {
+                $download_errors = maybe_unserialize( $download_errors );
 
-
+                foreach( $download_errors as $row => $download ) {
+                    $data .= sprintf( __( '<br />&middot; The product %s cannot be found on line %s.', 'edd-csv-manager' ), $download['product'], $download['row'] );
+                }
+            }
+            delete_transient( 'edd_download_errors' );
+            break;
     }
 
     echo '<div class="' . $class . '"><p>' . $error . '</p>' . $data . '</div>';

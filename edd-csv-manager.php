@@ -3,7 +3,7 @@
 Plugin Name:     Easy Digital Downloads - CSV Manager
 Plugin URI:      https://easydigitaldownloads.com/extensions/edd-csv-manager/
 Description:     Allows store owners to import products from or export products to a CSV file
-Version:         1.0.7
+Version:         1.1.0
 Author:          Daniel J Griffiths and Pippin Williamson
 Author URI:      https://easydigitaldownloads.com
 @package         EDD CSV Manager
@@ -48,8 +48,9 @@ if( !class_exists( 'EDD_CSV_Manager' ) ) {
             $this->setup_constants();
             $this->includes();
             $this->load_textdomain();
-            $this->exporter();
-            $this->importer();
+            $this->settings_exporter();
+            $this->settings_importer();
+            $this->payment_history_importer();
 		}
 
 
@@ -84,8 +85,9 @@ if( !class_exists( 'EDD_CSV_Manager' ) ) {
          */
         private function includes() {
             require_once EDD_CSV_MANAGER_DIR . 'includes/functions.php';
-            require_once EDD_CSV_MANAGER_DIR . 'includes/class.exporter.php';
-            require_once EDD_CSV_MANAGER_DIR . 'includes/class.importer.php';
+            require_once EDD_CSV_MANAGER_DIR . 'includes/class.settings-exporter.php';
+            require_once EDD_CSV_MANAGER_DIR . 'includes/class.settings-importer.php';
+            require_once EDD_CSV_MANAGER_DIR . 'includes/class.payment-history-importer.php';
         }
 
 
@@ -123,28 +125,38 @@ if( !class_exists( 'EDD_CSV_Manager' ) ) {
 
 
         /**
-         * Setup the exporter
+         * Setup the settings exporter
          *
          * @since       1.0.0
          * @access      private
          * @return      void
          */
-        public function exporter() {
-            $exporter = EDD_CSVE();
+        public function settings_exporter() {
+            $exporter = EDD_CSV_SETTINGS_EXPORTER();
         }
 
 
         /**
-         * Setup the importer
+         * Setup the settings importer
          *
          * @since       1.0.0
          * @access      private
          * @return      void
          */
-        public function importer() {
-            $importer = EDD_CSVI();
+        public function settings_importer() {
+            $importer = EDD_CSV_SETTINGS_IMPORTER();
         }
 
+        /**
+         * Setup the payment history importer
+         *
+         * @since       1.1.0
+         * @access      private
+         * @return      void
+         */
+        public function payment_history_importer() {
+            $importer = EDD_CSV_PAYMENT_HISTORY_IMPORTER();
+        }
     }
 }
 
