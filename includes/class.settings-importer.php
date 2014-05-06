@@ -53,8 +53,8 @@ if( !class_exists( 'EDD_CSV_Settings_Importer' ) ) {
                 add_action( 'edd_tools_before', array( $this, 'add_metabox' ) );
             } elseif( version_compare( EDD_VERSION, '1.9.4', '>' ) && version_compare( EDD_VERSION, '2.0.0', '<' ) ) {
                 $this->page = 'edit.php?post_type=download&page=edd-tools';
-                //add_action( 'edd_tools_before', array( $this, 'add_metabox' ) );
-                add_action( 'edd_tools_import_export_after', array( $this, 'add_metabox' ) );
+                add_action( 'edd_tools_before', array( $this, 'add_metabox' ) );
+                //add_action( 'edd_tools_import_export_after', array( $this, 'add_metabox' ) );
             } else {
                 $this->page = 'edit.php?post_type=download&page=edd-tools';
                 add_action( 'edd_tools_import_export_after', array( $this, 'add_metabox' ) );
