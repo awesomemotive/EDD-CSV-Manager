@@ -2,8 +2,8 @@
 Contributors: ghost1227, mordauk, chriscct7
 Donate link:
 Tags: easy digital downloads, edd, csv, importer, exporter
-Requires at least: 3.3
-Tested up to: 3.6.1
+Requires at least: 3.6
+Tested up to: 3.9
 Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -13,6 +13,8 @@ Allow EDD site owners to import products from or export products to a CSV file.
 == Description ==
 
 Easy Digital Downloads CSV Manager is a simple, free extension for EDD which allows site owners to bulk import products from or export products to a CSV.
+
+This extension also allows you to import past purchase records into Easy Digital Downloads.
 
 Requires [Easy Digital Downloads](http://wordpress.org/extend/plugins/easy-digital-downloads/) v1.7 or later.
 
