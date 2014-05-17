@@ -502,10 +502,11 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
                     );
 
                     $payment_id = edd_insert_payment( $payment_data );
-                    if( !get_transient( 'has_headers' ) ) {
+                    if( !get_transient( 'resend_receipts' ) ) {
                         remove_action( 'edd_update_payment_status', 'edd_trigger_purchase_receipt', 10 );
                         remove_action( 'edd_complete_purchase', 'edd_trigger_purchase_receipt', 999 );
                     }
+
                     edd_update_payment_status( $payment_id, 'publish' );
                 }
             }
