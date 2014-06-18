@@ -4,7 +4,7 @@ Donate link:
 Tags: easy digital downloads, edd, csv, importer, exporter
 Requires at least: 3.6
 Tested up to: 3.9
-Stable tag: 1.1.3
+Stable tag: 1.1.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -52,6 +52,12 @@ If you are NOT using the Amazon S3 extension:
 
 
 == Changelog ==
+
+= Version 1.1.4 =
+* Fix bug with created users not passing ID/email properly
+* Add better handling for importing to multisite installs
+* Add support for custom file names
+* Allow filtering export filenames
 
 = Version 1.1.3 =
 * Fix typo in version compare
