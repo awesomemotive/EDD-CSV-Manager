@@ -3,7 +3,7 @@
  * CSV Product Exporter
  *
  * @since       1.0.0
- * @package     CSVManager\SettingsExporter
+ * @package     CSVManager\ProductExporter
  * @copyright   Copyright (c) 2013, Daniel J Griffiths
  */
 
@@ -12,9 +12,9 @@
 if( !defined( 'ABSPATH' ) ) exit;
 
 
-if( !class_exists( 'EDD_CSV_Settings_Exporter' ) ) {
+if( !class_exists( 'EDD_CSV_Product_Exporter' ) ) {
 
-    class EDD_CSV_Settings_Exporter {
+    class EDD_CSV_Product_Exporter {
 
         private static $instance;
 
@@ -30,7 +30,7 @@ if( !class_exists( 'EDD_CSV_Settings_Exporter' ) ) {
          */
         public static function instance() {
             if( !self::$instance ) {
-                self::$instance = new EDD_CSV_Settings_Exporter();
+                self::$instance = new EDD_CSV_Product_Exporter();
                 self::$instance->init();
             }
 
@@ -48,7 +48,7 @@ if( !class_exists( 'EDD_CSV_Settings_Exporter' ) ) {
         private function init() {
 
             if( version_compare( EDD_VERSION, '1.9.5', '<' ) ) {
-                $this->page = 'tools.php?page=edd-settings-export-import';
+                $this->page = 'tools.php?page=edd-product-export-import';
                 add_action( 'edd_tools_before', array( $this, 'add_metabox' ) );
             } elseif( version_compare( EDD_VERSION, '1.9.4', '>' ) && version_compare( EDD_VERSION, '2.0', '<' ) ) {
                 $this->page = 'edit.php?post_type=download&page=edd-tools';
@@ -319,6 +319,6 @@ if( !class_exists( 'EDD_CSV_Settings_Exporter' ) ) {
 }
 
 
-function EDD_CSV_SETTINGS_EXPORTER() {
-    return EDD_CSV_Settings_Exporter::instance();
+function EDD_CSV_PRODUCT_EXPORTER() {
+    return EDD_CSV_Product_Exporter::instance();
 }

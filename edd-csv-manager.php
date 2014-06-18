@@ -48,8 +48,8 @@ if( !class_exists( 'EDD_CSV_Manager' ) ) {
             $this->setup_constants();
             $this->includes();
             $this->load_textdomain();
-            $this->settings_exporter();
-            $this->settings_importer();
+            $this->product_exporter();
+            $this->product_importer();
             $this->payment_history_importer();
 		}
 
@@ -85,8 +85,8 @@ if( !class_exists( 'EDD_CSV_Manager' ) ) {
          */
         private function includes() {
             require_once EDD_CSV_MANAGER_DIR . 'includes/functions.php';
-            require_once EDD_CSV_MANAGER_DIR . 'includes/class.settings-exporter.php';
-            require_once EDD_CSV_MANAGER_DIR . 'includes/class.settings-importer.php';
+            require_once EDD_CSV_MANAGER_DIR . 'includes/class.product-exporter.php';
+            require_once EDD_CSV_MANAGER_DIR . 'includes/class.product-importer.php';
             require_once EDD_CSV_MANAGER_DIR . 'includes/class.payment-history-importer.php';
         }
 
@@ -125,26 +125,26 @@ if( !class_exists( 'EDD_CSV_Manager' ) ) {
 
 
         /**
-         * Setup the settings exporter
+         * Setup the product exporter
          *
          * @since       1.0.0
          * @access      private
          * @return      void
          */
-        public function settings_exporter() {
-            $exporter = EDD_CSV_SETTINGS_EXPORTER();
+        public function product_exporter() {
+            $exporter = EDD_CSV_PRODUCT_EXPORTER();
         }
 
 
         /**
-         * Setup the settings importer
+         * Setup the product importer
          *
          * @since       1.0.0
          * @access      private
          * @return      void
          */
-        public function settings_importer() {
-            $importer = EDD_CSV_SETTINGS_IMPORTER();
+        public function product_importer() {
+            $importer = EDD_CSV_PRODUCT_IMPORTER();
         }
 
         /**

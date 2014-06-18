@@ -3,7 +3,7 @@
  * CSV Product Importer
  *
  * @since       1.0.0
- * @package     CSVManager\SettingsImporter
+ * @package     CSVManager\ProductImporter
  * @copyright   Copyright (c) 2013, Daniel J Griffiths
  */
 
@@ -12,9 +12,9 @@
 if( !defined( 'ABSPATH' ) ) exit;
 
 
-if( !class_exists( 'EDD_CSV_Settings_Importer' ) ) {
+if( !class_exists( 'EDD_CSV_Product_Importer' ) ) {
 
-    class EDD_CSV_Settings_Importer {
+    class EDD_CSV_Product_Importer {
 
         private static $instance;
 
@@ -30,7 +30,7 @@ if( !class_exists( 'EDD_CSV_Settings_Importer' ) ) {
          */
         public static function instance() {
             if( !self::$instance ) {
-                self::$instance = new EDD_CSV_Settings_Importer();
+                self::$instance = new EDD_CSV_Product_Importer();
                 self::$instance->includes();
                 self::$instance->init();
             }
@@ -49,7 +49,7 @@ if( !class_exists( 'EDD_CSV_Settings_Importer' ) ) {
         private function init() {
 
             if( version_compare( EDD_VERSION, '1.9.5', '<' ) ) {
-                $this->page = 'tools.php?page=edd-settings-export-import';
+                $this->page = 'tools.php?page=edd-product-export-import';
                 add_action( 'edd_tools_before', array( $this, 'add_metabox' ) );
             } elseif( version_compare( EDD_VERSION, '1.9.4', '>' ) && version_compare( EDD_VERSION, '2.0', '<' ) ) {
                 $this->page = 'edit.php?post_type=download&page=edd-tools';
@@ -98,10 +98,10 @@ if( !class_exists( 'EDD_CSV_Settings_Importer' ) ) {
             echo '<p>' . __( 'Import products to your Easy Digital Downloads site from a .csv file.', 'edd-csv-manager' ) . '</p>';
             echo '<form method="post" enctype="multipart/form-data" action="' . admin_url( $this->page ) . '">';
 
-            if( isset( $_GET['errno'] ) && isset( $_GET['type'] ) && $_GET['type'] == 'settings' )
+            if( isset( $_GET['errno'] ) && isset( $_GET['type'] ) && $_GET['type'] == 'products' )
                 edd_csv_error_handler( $_GET['errno'] );
 
-            if( empty( $_GET['step'] ) || $_GET['step'] == 1 || ( isset( $_GET['type'] ) && $_GET['type'] != 'settings' ) ) {
+            if( empty( $_GET['step'] ) || $_GET['step'] == 1 || ( isset( $_GET['type'] ) && $_GET['type'] != 'products' ) ) {
                 if( empty( $_GET['step'] ) || $_GET['step'] == 1 ) {
                     // Cleanup data to provent accidental carryover
                     $this->cleanup();
@@ -114,7 +114,7 @@ if( !class_exists( 'EDD_CSV_Settings_Importer' ) ) {
                 wp_nonce_field( 'edd_import_nonce', 'edd_import_nonce' );
                 submit_button( __( 'Next', 'edd-csv-manager' ), 'secondary', 'submit', false );
                 echo '</p>';
-            } elseif( $_GET['step'] == 2 && isset( $_GET['type'] ) && $_GET['type'] == 'settings' ) {
+            } elseif( $_GET['step'] == 2 && isset( $_GET['type'] ) && $_GET['type'] == 'products' ) {
                 $fields = get_transient( 'edd_csv_headers' );
 
                 // Display CSV fields for mapping
@@ -258,7 +258,7 @@ if( !class_exists( 'EDD_CSV_Settings_Importer' ) ) {
 
             // Make sure we have a valid CSV
             if( empty( $import_file ) || !$this->is_valid_csv( $_FILES['import_file']['name'] ) ) {
-                wp_redirect( add_query_arg( array( 'tab' => 'import_export', 'type' => 'settings', 'step' => '1', 'errno' => '2' ), $this->page ) );
+                wp_redirect( add_query_arg( array( 'tab' => 'import_export', 'type' => 'products', 'step' => '1', 'errno' => '2' ), $this->page ) );
                 exit;
             }
 
@@ -275,7 +275,7 @@ if( !class_exists( 'EDD_CSV_Settings_Importer' ) ) {
             }
             set_transient( 'edd_csv_file', basename( $import_file ) );
 
-            wp_redirect( add_query_arg( array( 'tab' => 'import_export', 'type' => 'settings', 'step' => '2' ), $this->page ) ); exit;
+            wp_redirect( add_query_arg( array( 'tab' => 'import_export', 'type' => 'products', 'step' => '2' ), $this->page ) ); exit;
         }
 
 
@@ -320,7 +320,7 @@ if( !class_exists( 'EDD_CSV_Settings_Importer' ) ) {
             $fields = array_flip( $_POST['csv_fields'] );
 
             if( $this->map_has_duplicates( $_POST['csv_fields'] ) ) {
-                wp_redirect( add_query_arg( array( 'tab' => 'import_export', 'type' => 'settings', 'step' => '2', 'errno' => '1' ), $this->page ) );
+                wp_redirect( add_query_arg( array( 'tab' => 'import_export', 'type' => 'products', 'step' => '2', 'errno' => '1' ), $this->page ) );
                 exit;
             }
 
@@ -468,13 +468,21 @@ if( !class_exists( 'EDD_CSV_Settings_Importer' ) ) {
                         ) {
                             // Set preferred path for file hosting
                             $search_base_path = trailingslashit( WP_CONTENT_DIR );
+                            $date = date( 'Y/m' );
 
                             // Handle multisite installs
                             if( is_multisite() ) {
                                 global $blog_id;
-                                $preferred_path = $search_base_path . 'uploads/sites/' . $blog_id . '/edd/' . $file;
+                                $preferred_dir = $search_base_path . 'uploads/sites/' . $blog_id . '/edd/' . $date;
                             } else {
-                                $preferred_path = $search_base_path . 'uploads/edd/' . $file;
+                                $preferred_dir = $search_base_path . 'uploads/edd/' . $date;
+                            }
+
+                            $preferred_path = $preferred_dir . '/' . $file;
+
+                            // Make sure the preferred directory exists
+                            if( ! file_exists( $preferred_dir ) ) {
+                                wp_mkdir_p( $preferred_dir );
                             }
 
                             if( file_exists( $preferred_path ) ) {
@@ -634,14 +642,14 @@ if( !class_exists( 'EDD_CSV_Settings_Importer' ) ) {
                                 $image_errors = serialize( $final_images[0]['path'] );
                                 set_transient( 'edd_image_errors', $image_errors );
 
-                                wp_redirect( add_query_arg( array( 'tab' => 'import_export', 'type' => 'settings', 'step' => '1', 'errno' => '4' ), $this->page ) );
+                                wp_redirect( add_query_arg( array( 'tab' => 'import_export', 'type' => 'products', 'step' => '1', 'errno' => '4' ), $this->page ) );
                                 exit;
                             }
                         } else {
                             $image_errors = serialize( $final_images[0]['path'] );
                             set_transient( 'edd_image_perms_errors', $image_errors );
 
-                            wp_redirect( add_query_arg( array( 'tab' => 'import_export', 'type' => 'settings', 'step' => '1', 'errno' => '5' ), $this->page ) );
+                            wp_redirect( add_query_arg( array( 'tab' => 'import_export', 'type' => 'products', 'step' => '1', 'errno' => '5' ), $this->page ) );
                             exit;
                         }
                     }
@@ -683,17 +691,17 @@ if( !class_exists( 'EDD_CSV_Settings_Importer' ) ) {
                 $file_errors = serialize( $file_errors );
                 set_transient( 'edd_file_errors', $file_errors );
 
-                wp_redirect( add_query_arg( array( 'tab' => 'import_export', 'type' => 'settings', 'step' => '1', 'errno' => '3' ), $this->page ) );
+                wp_redirect( add_query_arg( array( 'tab' => 'import_export', 'type' => 'products', 'step' => '1', 'errno' => '3' ), $this->page ) );
                 exit;
             }
 
-            wp_redirect( add_query_arg( array( 'tab' => 'import_export', 'type' => 'settings', 'step' => '1', 'errno' => '0' ), $this->page ) );
+            wp_redirect( add_query_arg( array( 'tab' => 'import_export', 'type' => 'products', 'step' => '1', 'errno' => '0' ), $this->page ) );
             exit;
         }
     }
 }
 
 
-function EDD_CSV_SETTINGS_IMPORTER() {
-    return EDD_CSV_Settings_Importer::instance();
+function EDD_CSV_PRODUCT_IMPORTER() {
+    return EDD_CSV_Product_Importer::instance();
 }
