@@ -419,7 +419,7 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
 
                 if( !$user ) {
                     $password = wp_generate_password();
-                    $user = wp_insert_user(
+                    $user_id = wp_insert_user(
                         array(
                             'user_email'    => sanitize_email( $new_row[ $user_email_key ] ),
                             'user_login'    => sanitize_email( $new_row[ $user_email_key ] ),
@@ -429,7 +429,7 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
                         )
                     );
 
-                    $user_id = $user->ID;
+                    $user    = get_user_by( 'id', $user_id );
                     $email   = $user->user_email;
                 } else {
                     $user_id = $user->ID;
