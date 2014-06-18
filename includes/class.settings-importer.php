@@ -468,7 +468,14 @@ if( !class_exists( 'EDD_CSV_Settings_Importer' ) ) {
                         ) {
                             // Set preferred path for file hosting
                             $search_base_path = trailingslashit( WP_CONTENT_DIR );
-                            $preferred_path = $search_base_path . 'uploads/edd/' . $file;
+
+                            // Handle multisite installs
+                            if( is_multisite() ) {
+                                global $blog_id;
+                                $preferred_path = $search_base_path . 'uploads/sites/' . $blog_id . '/edd/' . $file;
+                            } else {
+                                $preferred_path = $search_base_path . 'uploads/edd/' . $file;
+                            }
 
                             if( file_exists( $preferred_path ) ) {
                                 // Check /wp-content/uploads/edd/$file
