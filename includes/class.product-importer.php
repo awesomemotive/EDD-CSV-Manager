@@ -189,6 +189,7 @@ if( !class_exists( 'EDD_CSV_Product_Importer' ) ) {
                 'post_date'                 => __( 'Date Created', 'edd-csv-manager' ),
                 'post_content'              => __( 'Description', 'edd-csv-manager' ),
                 '_edd_files'                => __( 'Download Files', 'edd-csv-manager' ),
+                'file_names'                => __( 'File Names', 'edd-csv-manager' ),
                 '_edd_download_limit'       => __( 'Download Limit', 'edd-csv-manager' ),
                 'post_excerpt'              => __( 'Excerpt', 'edd-csv-manager' ),
                 '_edd_hide_purchase_link'   => __( 'Hide Purchase Link', 'edd-csv-manager' ),
@@ -380,7 +381,8 @@ if( !class_exists( 'EDD_CSV_Product_Importer' ) ) {
                 '_edd_button_behavior'      => '',
                 '_edd_hide_purchase_link'   => '',
 				'_edd_images'               => '',
-				'edd_sku'                   => ''
+				'edd_sku'                   => '',
+                'file_names'                => ''
             );
 
             $defaults = apply_filters( 'edd_csv_default_fields', $defaults );
@@ -420,7 +422,8 @@ if( !class_exists( 'EDD_CSV_Product_Importer' ) ) {
             $tags_key           = array_search( $csv_fields['tags'], $headers );
 
             // Files
-            $files_key          = array_search( $csv_fields['_edd_files'], $headers);
+            $files_key          = array_search( $csv_fields['_edd_files'], $headers );
+            $file_names_key     = array_search( $csv_fields['file_names'], $headers );
 
             foreach( $csv->data as $key => $row ) {
                 $new_row = array();
@@ -448,11 +451,12 @@ if( !class_exists( 'EDD_CSV_Product_Importer' ) ) {
                 if( $files_key && !empty( $new_row[ $files_key ] ) ) {
 
                     $files = array_map( 'trim', explode( '|', $new_row[ $files_key ] ) );
+                    $file_names = ( $file_names_key && !empty( $new_row[ $file_names_key ] ) ? array_map( 'trim', explode( '|', $new_row[ $file_names_key ] ) ) : array() );
                     $final_files = array();
                     $file_path = '';
 
                     // Make sure files exist
-                    foreach( $files as $file ) {
+                    foreach( $files as $id => $file ) {
                         $file_details = parse_url( $file );
 
                         if(
@@ -514,9 +518,16 @@ if( !class_exists( 'EDD_CSV_Product_Importer' ) ) {
                              $file_path = $file;
                         }
 
+                        // Process file names if available
+                        if( !empty( $file_names[ $id ] ) ) {
+                            $file_name = $file_names[ $id ];
+                        } else {
+                            $file_name = basename( $file_path );
+                        }
+
                         // Store file in array for later use
                         $final_files[] = array(
-                            'name'  => basename( $file_path ),
+                            'name'  => $file_name,
                             'file'  => str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $file_path )
                         );
                     }
