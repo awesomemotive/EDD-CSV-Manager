@@ -292,7 +292,7 @@ if( !class_exists( 'EDD_CSV_Product_Exporter' ) ) {
             nocache_headers();
 
             header( 'Content-type: application/octet-stream' );
-            header( 'Content-disposition: attachment; filename=edd-export-product-backup-' . date( 'm-d-y' ) . '.zip' );
+            header( 'Content-disposition: attachment; filename=' . apply_filters( 'edd_products_export_zip_filename', 'edd-export-product-backup-' . date( 'm-d-y' ) ) . '.zip' );
             header( 'Expires: -1' );
         }
 
@@ -312,7 +312,7 @@ if( !class_exists( 'EDD_CSV_Product_Exporter' ) ) {
             nocache_headers();
 
             header( 'Content-Type: text/csv; charset=utf-8' );
-            header( 'Content-Disposition: attachment; filename=edd-export-products-' . date( 'm-d-y' ) . '.csv' );
+            header( 'Content-Disposition: attachment; filename=' . apply_filters( 'edd_products_export_filename', 'edd-export-products-' . date( 'm-d-y' ) ) . '.csv' );
             header( 'Expires: 0' );
         }
     }
