@@ -72,7 +72,7 @@ if( !class_exists( 'EDD_CSV_Product_Exporter' ) ) {
          * @return      void
          */
         public function add_metabox() {
-            echo '<div class="postbox">';
+            echo '<div class="postbox" id="edd-product-export">';
             echo '<h3><span>' . __( 'Export Products to CSV', 'edd-csv-manager' ) . '</span></h3>';
             echo '<div class="inside">';
             echo '<p>' . __( 'Export products from your Easy Digital Downloads site to a .csv file.', 'edd-csv-manager' ) . '</p>';

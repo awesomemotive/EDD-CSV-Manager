@@ -92,7 +92,7 @@ if( !class_exists( 'EDD_CSV_Product_Importer' ) ) {
 
             ob_start();
 
-            echo '<div class="postbox">';
+            echo '<div class="postbox" id="edd-product-import">';
             echo '<h3><span>' . __( 'Import Products from CSV', 'edd-csv-manager' ) . '</span></h3>';
             echo '<div class="inside">';
             echo '<p>' . __( 'Import products to your Easy Digital Downloads site from a .csv file.', 'edd-csv-manager' ) . '</p>';
@@ -275,7 +275,7 @@ if( !class_exists( 'EDD_CSV_Product_Importer' ) ) {
             }
             set_transient( 'edd_csv_file', basename( $import_file ) );
 
-            wp_redirect( add_query_arg( array( 'tab' => 'import_export', 'type' => 'products', 'step' => '2' ), $this->page ) ); exit;
+            wp_redirect( add_query_arg( array( 'tab' => 'import_export', 'type' => 'products', 'step' => '2#edd-product-import' ), $this->page ) ); exit;
         }
 
 
@@ -320,7 +320,7 @@ if( !class_exists( 'EDD_CSV_Product_Importer' ) ) {
             $fields = array_flip( $_POST['csv_fields'] );
 
             if( $this->map_has_duplicates( $_POST['csv_fields'] ) ) {
-                wp_redirect( add_query_arg( array( 'tab' => 'import_export', 'type' => 'products', 'step' => '2', 'errno' => '1' ), $this->page ) );
+                wp_redirect( add_query_arg( array( 'tab' => 'import_export', 'type' => 'products', 'step' => '2#edd-product-import', 'errno' => '1' ), $this->page ) );
                 exit;
             }
 
