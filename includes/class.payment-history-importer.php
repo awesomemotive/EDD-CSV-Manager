@@ -429,7 +429,7 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
                         )
                     );
 
-                    $user    = get_user_by( 'id', $user_id );
+                    $user    = get_userdata( $user_id );
                     $email   = $user->user_email;
                 } else {
                     $user_id = $user->ID;
