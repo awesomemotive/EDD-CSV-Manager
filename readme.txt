@@ -3,8 +3,8 @@ Contributors: ghost1227, mordauk, chriscct7
 Donate link:
 Tags: easy digital downloads, edd, csv, importer, exporter
 Requires at least: 3.6
-Tested up to: 3.9
-Stable tag: 1.1.4
+Tested up to: 4.0
+Stable tag: 1.1.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -52,6 +52,10 @@ If you are NOT using the Amazon S3 extension:
 
 
 == Changelog ==
+
+= Version 1.1.5 =
+
+* Fixed a bug that caused purchase history import to fail if the products column was the first column in the CSV
 
 = Version 1.1.4 =
 * Fix bug with created users not passing ID/email properly
