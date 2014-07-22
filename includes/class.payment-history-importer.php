@@ -439,7 +439,7 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
                 $download_errors = array();
 
                 // Setup downloads
-                if( $downloads_key && !empty( $new_row[ $downloads_key ] ) ) {
+                if( false !== $downloads_key && !empty( $new_row[ $downloads_key ] ) ) {
 
                     $downloads       = array_map( 'trim', explode( '|', $new_row[ $downloads_key ] ) );
                     $final_downloads = array();
