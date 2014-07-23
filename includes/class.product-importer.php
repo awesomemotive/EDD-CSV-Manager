@@ -559,24 +559,39 @@ if( !class_exists( 'EDD_CSV_Product_Importer' ) ) {
                     if( !$image_details || !isset( $image_details['scheme'] ) || ( 'http' != $image_details['scheme'] && 'https' != $image_details['scheme'] && strpos( $image_file, site_url() ) !== false ) ) {
                         // Set preferred path for file hosting
                         $search_base_path = trailingslashit( WP_CONTENT_DIR );
-                        $preferred_path = $search_base_path . 'uploads/edd/' . $image_file;
+                        $date = date( 'Y/m' );
+
+                        // Handle multisite installs
+                        if( is_multisite() ) {
+                            global $blog_id;
+                            $preferred_dir = $search_base_path . 'uploads/sites/' . $blog_id . '/' . $date;
+                        } else {
+                            $preferred_dir = $search_base_path . 'uploads/' . $date;
+                        }
+
+                        $preferred_path = $preferred_dir . '/' . $file;
+
+                        // Make sure the preferred directory exists
+                        if( ! file_exists( $preferred_dir ) ) {
+                            wp_mkdir_p( $preferred_dir );
+                        }
 
                         if( file_exists( $preferred_path ) ) {
                             // Check /wp-content/uploads/edd/$file
                             $file_path = $preferred_path;
-                        } elseif( file_exists( $search_base_path . $image_file ) ) {
+                        } elseif( file_exists( $search_base_path . $file ) ) {
                             // Check /wp-content/$file
-                            if( rename( $search_base_path . $image_file, $preferred_path ) ) {
+                            if( rename( $search_base_path . $file, $preferred_path ) ) {
                                 $file_path = $preferred_path;
                             } else {
-                                $file_path = $search_base_path . $image_file;
+                                $file_path = $search_base_path . $file;
                             }
-                        } elseif( file_exists( $search_base_path . 'uploads/' . $image_file ) ) {
+                        } elseif( file_exists( $search_base_path . 'uploads/' . $file ) ) {
                             // Check /wp-content/uploads/$file
-                            if( rename( $search_base_path . 'uploads/' . $image_file, $preferred_path ) ) {
+                            if( rename( $search_base_path . 'uploads/' . $file, $preferred_path ) ) {
                                 $file_path = $preferred_path;
                             } else {
-                                $file_path = $search_base_path . 'uploads/' . $image_file;
+                                $file_path = $search_base_path . 'uploads/' . $file;
                             }
                         } else {
                             // Error
