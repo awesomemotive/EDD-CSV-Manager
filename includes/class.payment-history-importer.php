@@ -465,10 +465,15 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
                             );
                         
                             $cart_details[] = array(
-                                'id'       => $download->ID,
-                                'price'    => '',
-                                'tax'      => 0,
-                                'quantity' => 1
+                                'id'         => $download->ID,
+                                'name'       => $download_name,
+                                'item_price' => $new_row[ $price_key ],
+                                'subtotal'   => $new_row[ $price_key ],
+                                'price'      => $new_row[ $price_key ],
+                                'discount'   => '',
+                                'fees'       => '',
+                                'tax'        => 0,
+                                'quantity'   => 1
                             );
                         } else {
                             // Error
