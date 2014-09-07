@@ -655,7 +655,7 @@ if( !class_exists( 'EDD_CSV_Product_Importer' ) ) {
                         $upload_dir = wp_upload_dir();
 
                         if( stristr( $final_images[0]['path'], $upload_dir['basedir'] ) ) {
-                            $attachment_url = str_replace( $upload_dir['basedir'], '', $final_images[0]['path'] );
+                            $attachment_url = str_replace( $upload_dir['basedir'] . '/', '', $final_images[0]['path'] );
 
                             $attachment_id = wp_insert_attachment( $attachment, $attachment_url, $post_id );
 
