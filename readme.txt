@@ -1,10 +1,10 @@
 === Easy Digital Downloads - CSV Manager ===
-Contributors: ghost1227, mordauk, chriscct7
+Contributors: section214, mordauk, chriscct7
 Donate link:
 Tags: easy digital downloads, edd, csv, importer, exporter
 Requires at least: 3.6
 Tested up to: 4.0
-Stable tag: 1.1.7
+Stable tag: 1.1.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -52,6 +52,9 @@ If you are NOT using the Amazon S3 extension:
 
 
 == Changelog ==
+
+= Version 1.1.8 =
+* Fixed issue with double slashes in featured images
 
 = Version 1.1.7 =
 * Fixed missing item details for purchase import
