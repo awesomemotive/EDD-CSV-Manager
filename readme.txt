@@ -53,6 +53,9 @@ If you are NOT using the Amazon S3 extension:
 
 == Changelog ==
 
+= Version 1.1.9 =
+* Added check for email address as username on import
+
 = Version 1.1.8 =
 * Fixed issue with double slashes in featured images
 
