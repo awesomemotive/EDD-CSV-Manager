@@ -418,6 +418,10 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
                 $user = get_user_by( 'email', $new_row[ $user_email_key ] );
 
                 if( !$user ) {
+                    $user = get_user_by( 'login', $new_row[ $user_email_key ] );
+                }
+
+                if( !$user ) {
                     $password = wp_generate_password();
                     $user_id = wp_insert_user(
                         array(
