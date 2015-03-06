@@ -130,7 +130,8 @@ if( !class_exists( 'EDD_CSV_Product_Exporter' ) ) {
                 '_edd_button_behavior',
                 '_edd_hide_purchase_link',
 				'_edd_images',
-				'edd_sku'
+                'edd_sku',
+                'edd_product_notes'
             );
 
             $headers = apply_filters( 'edd_csv_export_headers', $headers );
@@ -203,6 +204,7 @@ if( !class_exists( 'EDD_CSV_Product_Exporter' ) ) {
                 $button_behavior    = get_post_meta( $download->ID, '_edd_button_behavior', true );
 				$hide_purchase_link = get_post_meta( $download->ID, '_edd_hide_purchase_link', true );
 				$edd_sku            = get_post_meta( $download->ID, 'edd_sku', true );
+                $edd_product_notes  = get_post_meta( $download->ID, 'edd_product_notes', true );
 
                 $image_id           = get_post_thumbnail_id( $download->ID );
                 $image_details      = wp_get_attachment_image_src( $image_id );
@@ -225,7 +227,8 @@ if( !class_exists( 'EDD_CSV_Product_Exporter' ) ) {
                     $button_behavior,
 					$hide_purchase_link,
                     $image_details[0],
-					$edd_sku
+                    $edd_sku,
+                    $edd_product_notes
                 );
                 $row = apply_filters( 'edd_csv_export_row', $row );
 

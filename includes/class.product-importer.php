@@ -199,7 +199,8 @@ if( !class_exists( 'EDD_CSV_Product_Importer' ) ) {
                 'post_title'                => __( 'Product Name', 'edd-csv-manager' ),
                 'post_status'               => __( 'Status', 'edd-csv-manager' ),
 				'tags'                      => __( 'Tags', 'edd-csv-manager' ),
-				'edd_sku'                   => __( 'SKU', 'edd-csv-manager' )
+                'edd_sku'                   => __( 'SKU', 'edd-csv-manager' ),
+                'edd_product_notes'         => __( 'Product Notes', 'edd-csv-manager' )
             );
 
             $fields = apply_filters( 'edd_csv_fields', $fields );
@@ -381,7 +382,8 @@ if( !class_exists( 'EDD_CSV_Product_Importer' ) ) {
                 '_edd_button_behavior'      => '',
                 '_edd_hide_purchase_link'   => '',
 				'_edd_images'               => '',
-				'edd_sku'                   => '',
+                'edd_sku'                   => '',
+                'edd_product_notes'         => '',
                 'file_names'                => ''
             );
 
@@ -414,6 +416,7 @@ if( !class_exists( 'EDD_CSV_Product_Importer' ) ) {
             $button_behavior    = array_search( $csv_fields['_edd_button_behavior'], $headers );
             $hide_link          = array_search( $csv_fields['_edd_hide_purchase_link'], $headers );
 			$edd_sku            = array_search( $csv_fields['edd_sku'], $headers );
+            $edd_product_notes  = array_search( $csv_fields['edd_product_notes'], $headers );
 
             // Categories
             $categories_key     = array_search( $csv_fields['categories'], $headers );
@@ -633,7 +636,10 @@ if( !class_exists( 'EDD_CSV_Product_Importer' ) ) {
                         update_post_meta( $post_id, '_edd_hide_purchase_link', $new_row[ $hide_link ] );
 
 					if( $edd_sku && !empty( $new_row[ $edd_sku ] ) )
-						update_post_meta( $post_id, 'edd_sku', $new_row[ $edd_sku ] );
+                        update_post_meta( $post_id, 'edd_sku', $new_row[ $edd_sku ] );
+
+                    if( $edd_product_notes && !empty( $new_row[ $edd_product_notes ] ) )
+                        update_post_meta( $post_id, 'edd_product_notes', $new_row[ $edd_product_notes] );
 
                     if( !empty( $final_files ) )
                         update_post_meta( $post_id, 'edd_download_files', $final_files );
