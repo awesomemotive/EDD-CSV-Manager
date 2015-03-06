@@ -4,7 +4,7 @@ Donate link:
 Tags: easy digital downloads, edd, csv, importer, exporter
 Requires at least: 3.6
 Tested up to: 4.0
-Stable tag: 1.1.9
+Stable tag: 1.1.10
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -52,6 +52,9 @@ If you are NOT using the Amazon S3 extension:
 
 
 == Changelog ==
+
+= Version 1.1.10 =
+* Added product notes support
 
 = Version 1.1.9 =
 * Added check for email address as username on import
