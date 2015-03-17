@@ -4,7 +4,7 @@ Donate link:
 Tags: easy digital downloads, edd, csv, importer, exporter
 Requires at least: 3.6
 Tested up to: 4.0
-Stable tag: 1.1.10
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -52,6 +52,10 @@ If you are NOT using the Amazon S3 extension:
 
 
 == Changelog ==
+
+= Version 1.2.0 =
+* Added payment history exporter
+* Added sample CSV files
 
 = Version 1.1.10 =
 * Added product notes support
