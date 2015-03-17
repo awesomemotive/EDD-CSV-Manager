@@ -50,6 +50,7 @@ if( !class_exists( 'EDD_CSV_Manager' ) ) {
             $this->load_textdomain();
             $this->product_exporter();
             $this->product_importer();
+            $this->payment_history_exporter();
             $this->payment_history_importer();
 		}
 
@@ -87,6 +88,7 @@ if( !class_exists( 'EDD_CSV_Manager' ) ) {
             require_once EDD_CSV_MANAGER_DIR . 'includes/functions.php';
             require_once EDD_CSV_MANAGER_DIR . 'includes/class.product-exporter.php';
             require_once EDD_CSV_MANAGER_DIR . 'includes/class.product-importer.php';
+            require_once EDD_CSV_MANAGER_DIR . 'includes/class.payment-history-exporter.php';
             require_once EDD_CSV_MANAGER_DIR . 'includes/class.payment-history-importer.php';
         }
 
@@ -145,6 +147,17 @@ if( !class_exists( 'EDD_CSV_Manager' ) ) {
          */
         public function product_importer() {
             $importer = EDD_CSV_PRODUCT_IMPORTER();
+        }
+
+        /**
+         * Setup the payment history exporter
+         *
+         * @since       1.2.0
+         * @access      private
+         * @return      void
+         */
+        public function payment_history_exporter() {
+            $exporter = EDD_CSV_PAYMENT_HISTORY_EXPORTER();
         }
 
         /**
