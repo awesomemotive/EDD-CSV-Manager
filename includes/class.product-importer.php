@@ -461,7 +461,7 @@ if( !class_exists( 'EDD_CSV_Product_Importer' ) ) {
                     // Make sure files exist
                     foreach( $files as $id => $file ) {
                         $file_details = parse_url( $file );
-
+                        
                         if(
                             (
                                 ! $file_details ||
@@ -473,6 +473,7 @@ if( !class_exists( 'EDD_CSV_Product_Importer' ) ) {
                                 )
                             ) && ! isset( $_POST['edd_import_s3'] )
                         ) {
+                            
                             // Set preferred path for file hosting
                             $search_base_path = trailingslashit( WP_CONTENT_DIR );
                             $date = date( 'Y/m' );
@@ -572,7 +573,7 @@ if( !class_exists( 'EDD_CSV_Product_Importer' ) ) {
                             $preferred_dir = $search_base_path . 'uploads/' . $date;
                         }
 
-                        $preferred_path = $preferred_dir . '/' . $file;
+                        $preferred_path = $preferred_dir . '/' . $image_file;
 
                         // Make sure the preferred directory exists
                         if( ! file_exists( $preferred_dir ) ) {
@@ -580,28 +581,28 @@ if( !class_exists( 'EDD_CSV_Product_Importer' ) ) {
                         }
 
                         if( file_exists( $preferred_path ) ) {
-                            // Check /wp-content/uploads/edd/$file
+                            // Check /wp-content/uploads/edd/$image_file
                             $file_path = $preferred_path;
-                        } elseif( file_exists( $search_base_path . $file ) ) {
-                            // Check /wp-content/$file
-                            if( rename( $search_base_path . $file, $preferred_path ) ) {
+                        } elseif( file_exists( $search_base_path . $image_file ) ) {
+                            // Check /wp-content/$image_file
+                            if( rename( $search_base_path . $image_file, $preferred_path ) ) {
                                 $file_path = $preferred_path;
                             } else {
-                                $file_path = $search_base_path . $file;
+                                $file_path = $search_base_path . $image_file;
                             }
-                        } elseif( file_exists( $search_base_path . 'uploads/' . $file ) ) {
-                            // Check /wp-content/uploads/$file
-                            if( rename( $search_base_path . 'uploads/' . $file, $preferred_path ) ) {
+                        } elseif( file_exists( $search_base_path . 'uploads/' . $image_file ) ) {
+                            // Check /wp-content/uploads/$image_file
+                            if( rename( $search_base_path . 'uploads/' . $image_file, $preferred_path ) ) {
                                 $file_path = $preferred_path;
                             } else {
-                                $file_path = $search_base_path . 'uploads/' . $file;
+                                $file_path = $search_base_path . 'uploads/' . $image_file;
                             }
                         } else {
                             // Error
                             $image = false;
                             $file_errors[] = array(
                                 'row'   => $key + 1,
-                                'file'  => $file
+                                'file'  => $image_file
                             );
                         }
                     } else {
