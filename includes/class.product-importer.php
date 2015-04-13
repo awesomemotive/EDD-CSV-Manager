@@ -512,7 +512,7 @@ if( !class_exists( 'EDD_CSV_Product_Importer' ) ) {
                             } else {
                                 // Error
                                 $file_errors[] = array(
-                                    'row'   => $i + 1,
+                                    'row'   => $key + 1,
                                     'file'  => $file
                                 );
                             }
@@ -600,13 +600,14 @@ if( !class_exists( 'EDD_CSV_Product_Importer' ) ) {
                             // Error
                             $image = false;
                             $file_errors[] = array(
-                                'row'   => $i + 1,
-                                'file'  => $image_key
+                                'row'   => $key + 1,
+                                'file'  => $file
                             );
                         }
                     } else {
                         $file_path = $image_file;
                     }
+
 
                     // Store image in array for later use
                     $final_images[] = array(
