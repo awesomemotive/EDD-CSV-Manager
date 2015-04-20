@@ -1,5 +1,5 @@
 <?php
-/**
+/*
 Plugin Name:     Easy Digital Downloads - CSV Manager
 Plugin URI:      https://easydigitaldownloads.com/extensions/edd-csv-manager/
 Description:     Allows store owners to import products from or export products to a CSV file
