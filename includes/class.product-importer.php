@@ -678,14 +678,16 @@ if( !class_exists( 'EDD_CSV_Product_Importer' ) ) {
                                 $attachment_data = wp_generate_attachment_metadata( $attachment_id, $final_images[0]['path'] );
                                 wp_update_attachment_metadata( $attachment_id, $attachment_data );
                             } else {
-                                $image_errors = serialize( $final_images[0]['path'] );
+                                $image_errors[] = array( 'file' => $final_images[0]['path'] );
+                                $image_errors = serialize( $image_errors );
                                 set_transient( 'edd_image_errors', $image_errors );
 
                                 wp_safe_redirect( add_query_arg( array( 'tab' => 'import_export', 'type' => 'products', 'step' => '1', 'errno' => '4' ), $this->page ) );
                                 exit;
                             }
                         } else {
-                            $image_errors = serialize( $final_images[0]['path'] );
+                            $image_errors[] = array( 'file' => $final_images[0]['path'] );
+                            $image_errors = serialize( $image_errors );
                             set_transient( 'edd_image_perms_errors', $image_errors );
 
                             wp_safe_redirect( add_query_arg( array( 'tab' => 'import_export', 'type' => 'products', 'step' => '1', 'errno' => '5' ), $this->page ) );
