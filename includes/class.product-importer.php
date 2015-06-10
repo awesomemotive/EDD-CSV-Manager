@@ -661,10 +661,15 @@ if( !class_exists( 'EDD_CSV_Product_Importer' ) ) {
                         );
 
                         $upload_dir = wp_upload_dir();
+                        $attachment_url = false;
 
                         if( stristr( $final_images[0]['path'], $upload_dir['basedir'] ) ) {
                             $attachment_url = str_replace( $upload_dir['basedir'] . '/', '', $final_images[0]['path'] );
+                        } elseif( stristr( $final_images[0]['url'], $upload_dir['baseurl'] ) ) {
+                            $attachment_url = $final_images[0]['url'];
+                        }
 
+                        if( $attachment_url ) {
                             $attachment_id = wp_insert_attachment( $attachment, $attachment_url, $post_id );
 
                             if( !is_wp_error( $attachment_id ) && $attachment_id ) {
