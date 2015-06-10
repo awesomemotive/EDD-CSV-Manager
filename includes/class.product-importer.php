@@ -611,11 +611,13 @@ if( !class_exists( 'EDD_CSV_Product_Importer' ) ) {
 
 
                     // Store image in array for later use
-                    $final_images[] = array(
-                        'name'  => basename( $file_path ),
-                        'path'  => $file_path,
-                        'url'   => str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $file_path )
-                    );
+                    if( isset( $file_path ) ) {
+                        $final_images[] = array(
+                            'name'  => basename( $file_path ),
+                            'path'  => $file_path,
+                            'url'   => str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $file_path )
+                        );
+                    }
                 }
 
 
