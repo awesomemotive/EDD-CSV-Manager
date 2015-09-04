@@ -364,7 +364,7 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
                 'post_date'                 => '',
                 'user_email'                => '',
                 'purchase_key'              => strtolower( md5( uniqid() ) ),
-                'currency'                  => 'USD',
+                'currency'                  => edd_get_currency(),
                 'downloads'                 => '',
                 'cart_details'              => '',
                 'user_info'                 => array(
