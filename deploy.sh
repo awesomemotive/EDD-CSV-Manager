@@ -33,10 +33,6 @@ echo "readme version: $NEWVERSION1"
 NEWVERSION2=`grep "^Version" $GITPATH/$MAINFILE | awk -F' ' '{print $2}' | sed 's/[[:space:]]//g'`
 echo "$MAINFILE version: $NEWVERSION2"
 
-if [ "$NEWVERSION1" != "$NEWVERSION2" ]; then echo "Versions don't match. Exiting...."; exit 1; fi
-
-echo "Versions match in readme.txt and PHP file. Let's proceed..."
-
 cd $GITPATH
 echo -e "Enter a commit message for this new version: \c"
 read COMMITMSG
