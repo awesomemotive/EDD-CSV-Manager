@@ -493,7 +493,7 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
                         'post_date'     => date( 'Y-m-d H:i:s', strtotime( $new_row[ $post_date_key ] ) ),
                         'user_email'    => $new_row[ $user_email_key ],
                         'purchase_key'  => strtolower( md5( uniqid() ) ), // random key
-                        'currency'      => strtoupper( $currency_key ),
+                        'currency'      => strtoupper( $new_row[ $currency_key ] ),
                         'downloads'     => $products,
                         'cart_details'  => $cart_details,
                         'user_info'     => array(
