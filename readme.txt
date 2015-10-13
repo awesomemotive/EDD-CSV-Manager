@@ -3,8 +3,8 @@ Contributors: section214, mordauk, chriscct7
 Donate link:
 Tags: easy digital downloads, edd, csv, importer, exporter
 Requires at least: 3.6
-Tested up to: 4.3
-Stable tag: 1.2.5
+Tested up to: 4.4
+Stable tag: 1.2.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -51,6 +51,9 @@ If you are NOT using the Amazon S3 extension:
 
 
 == Changelog ==
+
+= Version 1.2.6 =
+* Fixed an issue with import files that include uploads/{year}/{month} in the file names
 
 = Version 1.2.5 =
 * Fixed bug with currency code not importing properly
