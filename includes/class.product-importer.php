@@ -499,14 +499,14 @@ if( !class_exists( 'EDD_CSV_Product_Importer' ) ) {
                             } elseif( file_exists( $search_base_path . $file ) ) {
                                 // Check /wp-content/$file
                                 if( rename( $search_base_path . $file, $preferred_path ) ) {
-                                    $file_path = $preferred_path . $file;
+                                    $file_path = $preferred_path;
                                 } else {
                                     $file_path = $search_base_path . $file;
                                 }
                             } elseif( file_exists( $search_base_path . 'uploads/' . $file ) ) {
                                 // Check /wp-content/uploads/$file
                                 if( rename( $search_base_path . 'uploads/' . $file, $preferred_path ) ) {
-                                    $file_path = $preferred_path . $file;
+                                    $file_path = $preferred_path;
                                 } else {
                                     $file_path = $search_base_path . 'uploads/' . $file;
                                 }
