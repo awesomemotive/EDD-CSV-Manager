@@ -557,10 +557,10 @@ if( !class_exists( 'EDD_CSV_Product_Importer' ) ) {
                     require_once ABSPATH . 'wp-admin/includes/media.php';
 
                     $image          = true;
-                    $image_file     = $new_row[ $image_key ];
-                    $image_details  = parse_url( $image_file );
+                    $file           = $new_row[ $image_key ];
+                    $image_details  = parse_url( $file );
 
-                    if( !$image_details || !isset( $image_details['scheme'] ) || ( 'http' != $image_details['scheme'] && 'https' != $image_details['scheme'] && strpos( $image_file, site_url() ) !== false ) ) {
+                    if( ! $image_details || !isset( $image_details['scheme'] ) || ( 'http' != $image_details['scheme'] && 'https' != $image_details['scheme'] && strpos( $image_file, site_url() ) !== false ) ) {
                         // Set preferred path for file hosting
                         $search_base_path = trailingslashit( WP_CONTENT_DIR );
                         $date = date( 'Y/m' );
@@ -568,12 +568,12 @@ if( !class_exists( 'EDD_CSV_Product_Importer' ) ) {
                         // Handle multisite installs
                         if( is_multisite() ) {
                             global $blog_id;
-                            $preferred_dir = $search_base_path . 'uploads/sites/' . $blog_id . '/' . $date;
+                            $preferred_dir = $search_base_path . 'uploads/sites/' . $blog_id . '/edd/' . $date;
                         } else {
-                            $preferred_dir = $search_base_path . 'uploads/' . $date;
+                            $preferred_dir = $search_base_path . 'uploads/edd/' . $date;
                         }
 
-                        $preferred_path = $preferred_dir . '/' . $image_file;
+                        $preferred_path = $preferred_dir . '/' . $file;
 
                         // Make sure the preferred directory exists
                         if( ! file_exists( $preferred_dir ) ) {
@@ -581,32 +581,32 @@ if( !class_exists( 'EDD_CSV_Product_Importer' ) ) {
                         }
 
                         if( file_exists( $preferred_path ) ) {
-                            // Check /wp-content/uploads/edd/$image_file
+                            // Check /wp-content/uploads/edd/$file
                             $file_path = $preferred_path;
-                        } elseif( file_exists( $search_base_path . $image_file ) ) {
-                            // Check /wp-content/$image_file
-                            if( rename( $search_base_path . $image_file, $preferred_path ) ) {
+                        } elseif( file_exists( $search_base_path . $file ) ) {
+                            // Check /wp-content/$file
+                            if( rename( $search_base_path . $file, $preferred_path ) ) {
                                 $file_path = $preferred_path;
                             } else {
-                                $file_path = $search_base_path . $image_file;
+                                $file_path = $search_base_path . $file;
                             }
-                        } elseif( file_exists( $search_base_path . 'uploads/' . $image_file ) ) {
-                            // Check /wp-content/uploads/$image_file
-                            if( rename( $search_base_path . 'uploads/' . $image_file, $preferred_path ) ) {
+                        } elseif( file_exists( $search_base_path . 'uploads/' . $file ) ) {
+                            // Check /wp-content/uploads/$file
+                            if( rename( $search_base_path . 'uploads/' . $file, $preferred_path ) ) {
                                 $file_path = $preferred_path;
                             } else {
-                                $file_path = $search_base_path . 'uploads/' . $image_file;
+                                $file_path = $search_base_path . 'uploads/' . $file;
                             }
                         } else {
                             // Error
-                            $image = false;
                             $file_errors[] = array(
                                 'row'   => $key + 1,
-                                'file'  => $image_file
+                                'file'  => $file
                             );
                         }
+
                     } else {
-                        $file_path = $image_file;
+                        $file_path = $file;
                     }
 
 
