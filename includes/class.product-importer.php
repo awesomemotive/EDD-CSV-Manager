@@ -193,7 +193,7 @@ if( !class_exists( 'EDD_CSV_Product_Importer' ) ) {
                 '_edd_download_limit'       => __( 'Download Limit', 'edd-csv-manager' ),
                 'post_excerpt'              => __( 'Excerpt', 'edd-csv-manager' ),
                 '_edd_hide_purchase_link'   => __( 'Hide Purchase Link', 'edd-csv-manager' ),
-                '_edd_images'               => __( 'Image Files', 'edd-csv-manager' ),
+                '_edd_images'               => __( 'Product Image', 'edd-csv-manager' ),
                 'post_name'                 => __( 'Post Name', 'edd-csv-manager' ),
                 '_edd_price'                => __( 'Price', 'edd-csv-manager' ),
                 'post_title'                => __( 'Product Name', 'edd-csv-manager' ),
