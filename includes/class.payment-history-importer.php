@@ -395,41 +395,45 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
             // Detect delimiter
             $csv->auto( $import_file );
 
-            // Map headers to post fields
-            $price_key          = array_search( $csv_fields['price'], $headers );
-            $post_date_key      = array_search( $csv_fields['post_date'], $headers );
-            $user_email_key     = array_search( $csv_fields['user_email'], $headers );
-            $currency_key       = array_search( $csv_fields['currency'], $headers );
-            $downloads_key      = array_search( $csv_fields['downloads'], $headers );
-            $tax_key            = array_search( $csv_fields['tax'], $headers );
-            $first_name_key     = array_search( $csv_fields['first_name'], $headers );
-            $last_name_key      = array_search( $csv_fields['last_name'], $headers );
-            $discount_key       = array_search( $csv_fields['discount'], $headers );
+            $post_fields = array(
+                'price',
+                'post_date',
+                'user_email',
+                'currency',
+                'downloads',
+                'tax',
+                'first_name',
+                'last_name',
+                'discount'
+            );
 
             foreach( $csv->data as $key => $row ) {
-                $new_row = array();
-                $i = 0;
-                foreach( $row as $column ) {
-                    $new_row[ $i ] = $column;
-                    $i++;
+                foreach ( $post_fields as $field_name ) {
+                    if ( isset( $csv_fields[ $field_name ] ) && isset( $row[ $csv_fields[ $field_name ] ] ) ) {
+                        $new_row[ $field_name ] = $row[ $csv_fields[ $field_name ] ];
+                    } else if ( isset( $defaults[ $field_name ] ) ) {
+                        $new_row[ $field_name ] = $defaults[ $field_name ];
+                    } else {
+                        $new_row[ $field_name ] = '';
+                    }
                 }
 
                 // Get user info or create new user
-                $user = get_user_by( 'email', $new_row[ $user_email_key ] );
+                $user = get_user_by( 'email', $new_row['user_email'] );
 
                 if( !$user ) {
-                    $user = get_user_by( 'login', $new_row[ $user_email_key ] );
+                    $user = get_user_by( 'login', $new_row['user_email'] );
                 }
 
                 if( !$user ) {
                     $password = wp_generate_password();
                     $user_id = wp_insert_user(
                         array(
-                            'user_email'    => sanitize_email( $new_row[ $user_email_key ] ),
-                            'user_login'    => sanitize_email( $new_row[ $user_email_key ] ),
+                            'user_email'    => sanitize_email( $new_row['user_email'] ),
+                            'user_login'    => sanitize_email( $new_row['user_email'] ),
                             'user_pass'     => $password,
-                            'first_name'    => sanitize_text_field( $new_row[ $first_name_key ] ),
-                            'last_name'     => sanitize_text_field( $new_row[ $last_name_key ] )
+                            'first_name'    => sanitize_text_field( $new_row['first_name'] ),
+                            'last_name'     => sanitize_text_field( $new_row['last_name'] )
                         )
                     );
 
@@ -443,13 +447,14 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
                 $download_errors = array();
 
                 // Setup downloads
-                if( false !== $downloads_key && !empty( $new_row[ $downloads_key ] ) ) {
+                if( !empty( $new_row['downloads'] ) ) {
 
-                    $downloads       = array_map( 'trim', explode( '|', $new_row[ $downloads_key ] ) );
+                    $downloads       = array_map( 'trim', explode( '|', $new_row['downloads'] ) );
                     $final_downloads = array();
                     $products        = array();
                     $cart_details    = array();
                     $i               = 0;
+                    $price_amount    = $new_row['price'];
 
                     // Make sure downloads exist
                     foreach( $downloads as $i => $download_name ) {
@@ -471,9 +476,9 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
                             $cart_details[] = array(
                                 'id'         => $download->ID,
                                 'name'       => $download_name,
-                                'item_price' => $new_row[ $price_key ],
-                                'subtotal'   => $new_row[ $price_key ],
-                                'price'      => $new_row[ $price_key ],
+                                'item_price' => $price_amount,
+                                'subtotal'   => $price_amount,
+                                'price'      => $price_amount,
                                 'discount'   => '',
                                 'fees'       => '',
                                 'tax'        => 0,
@@ -489,25 +494,25 @@ if( !class_exists( 'EDD_CSV_Payment_History_Importer' ) ) {
                     }
 
                     $payment_data = array(
-                        'price'         => $new_row[ $price_key ],
-                        'post_date'     => date( 'Y-m-d H:i:s', strtotime( $new_row[ $post_date_key ] ) ),
-                        'user_email'    => $new_row[ $user_email_key ],
+                        'price'         => $price_amount,
+                        'post_date'     => date( 'Y-m-d H:i:s', strtotime( $new_row['post_date'] ) ),
+                        'user_email'    => $new_row['user_email'],
                         'purchase_key'  => strtolower( md5( uniqid() ) ), // random key
-                        'currency'      => strtoupper( $new_row[ $currency_key ] ),
+                        'currency'      => strtoupper( $new_row['currency'] ),
                         'downloads'     => $products,
                         'cart_details'  => $cart_details,
                         'user_info'     => array(
                             'id'            => $user_id,
                             'email'         => $email,
-                            'first_name'    => $new_row[ $first_name_key ],
-                            'last_name'     => $new_row[ $last_name_key ],
-                            'discount'      => $new_row[ $discount_key ]
+                            'first_name'    => $new_row['first_name'],
+                            'last_name'     => $new_row['last_name'],
+                            'discount'      => $new_row['discount']
                         ),
                         'user_id'       => $user_id,
                         'status'        => 'pending',
                         'post_data'     => array(),
                         'gateway'       => 'csv_import',
-                        'tax'           => $new_row[ $tax_key ]
+                        'tax'           => $new_row['tax']
                     );
 
                     $payment_id = edd_insert_payment( $payment_data );
